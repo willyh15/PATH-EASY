@@ -26,13 +26,24 @@ BOOL CommandAliasDlg::OnInitDialog()
 
 void CommandAliasDlg::OnAddCommand() {
     CString newCommand;
-    // Assume m_commandInput is an input control
     m_commandInput.GetWindowText(newCommand);
-
-    if (newCommand.IsEmpty()) {
+    
+    if (!newCommand.IsEmpty()) {
+        m_commands.push_back(newCommand.GetString());
+        UpdateCommandList();
+        SaveCommands();
+    } else {
         AfxMessageBox(_T("Command cannot be empty!"));
-        return;
     }
+}
+
+void CommandAliasDlg::UpdateCommandList() {
+    m_listCommands.ResetContent();
+    for (const auto& cmd : m_commands) {
+        m_listCommands.AddString(cmd.c_str());
+    }
+}
+
 
 void CommandAliasDlg::OnEditCommand()
 {

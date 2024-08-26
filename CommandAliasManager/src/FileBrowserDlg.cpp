@@ -21,12 +21,21 @@ BOOL FileBrowserDlg::OnInitDialog()
     return TRUE;
 }
 
-void FileBrowserDlg::OnBrowse()
-{
-    CFileDialog fileDlg(TRUE);
-    if (fileDlg.DoModal() == IDOK)
-    {
-        CString filePath = fileDlg.GetPathName();
-        // Do something with the file path
+void FileBrowserDlg::OnBrowse() {
+    try {
+        CFileDialog fileDlg(TRUE);
+        if (fileDlg.DoModal() == IDOK) {
+            CString filePath = fileDlg.GetPathName();
+            // Check if file exists
+            if (PathFileExists(filePath)) {
+                // Do something with the file path
+            } else {
+                AfxMessageBox(_T("The selected file does not exist."));
+            }
+        }
+    } catch (const std::exception& e) {
+        CString errorMessage;
+        errorMessage.Format(_T("An error occurred while browsing: %s"), CString(e.what()));
+        AfxMessageBox(errorMessage);
     }
 }

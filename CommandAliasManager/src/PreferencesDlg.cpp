@@ -22,10 +22,29 @@ BOOL PreferencesDlg::OnInitDialog()
     return TRUE;
 }
 
-void PreferencesDlg::OnSavePreferences()
-{
-    // Logic to save user preferences
+void PreferencesDlg::OnSavePreferences() {
+    // Assume m_recentFilesCountCtrl and m_fileTypeFilterCtrl are input controls
+    CString numRecentFilesStr, fileTypeFilterStr;
+    m_recentFilesCountCtrl.GetWindowText(numRecentFilesStr);
+    m_fileTypeFilterCtrl.GetWindowText(fileTypeFilterStr);
+    
+    int numRecentFiles = _ttoi(numRecentFilesStr);
+    if (numRecentFiles < 0 || numRecentFiles > 100) {
+        AfxMessageBox(_T("Number of recent files must be between 0 and 100."));
+        return;
+    }
+
+    m_numRecentFiles = numRecentFiles;
+    m_defaultFileTypeFilter = fileTypeFilterStr;
+
+    SavePreferences();
+    AfxMessageBox(_T("Preferences saved successfully!"));
 }
+
+void PreferencesDlg::LoadPreferences() {
+    // Load preferences from a config file or registry
+}
+
 
 void PreferencesDlg::LoadPreferences()
 {

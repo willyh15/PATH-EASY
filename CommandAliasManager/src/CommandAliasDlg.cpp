@@ -24,10 +24,15 @@ BOOL CommandAliasDlg::OnInitDialog()
     return TRUE;
 }
 
-void CommandAliasDlg::OnAddCommand()
-{
-    // Logic to add a command or alias
-}
+void CommandAliasDlg::OnAddCommand() {
+    CString newCommand;
+    // Assume m_commandInput is an input control
+    m_commandInput.GetWindowText(newCommand);
+
+    if (newCommand.IsEmpty()) {
+        AfxMessageBox(_T("Command cannot be empty!"));
+        return;
+    }
 
 void CommandAliasDlg::OnEditCommand()
 {

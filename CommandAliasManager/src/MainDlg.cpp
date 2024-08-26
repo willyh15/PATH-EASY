@@ -1,53 +1,44 @@
-#include "stdafx.h"
 #include "MainDlg.h"
-#include "afxdialogex.h"
+#include "CommandAliasDlg.h"
+#include "FileBrowserDlg.h"
+#include "PreferencesDlg.h"
 
-BEGIN_MESSAGE_MAP(CMainDlg, CDialogEx)
-    ON_BN_CLICKED(IDC_BROWSE, &CMainDlg::OnBnClickedBrowse)
-    ON_BN_CLICKED(IDC_PREFERENCES, &CMainDlg::OnBnClickedPreferences)
-    ON_BN_CLICKED(IDC_MANAGE_COMMANDS, &CMainDlg::OnBnClickedManageCommands)
+BEGIN_MESSAGE_MAP(MainDlg, CDialogEx)
+    ON_BN_CLICKED(IDC_COMMAND_ALIAS_BUTTON, &MainDlg::OnCommandAliasClicked)
+    ON_BN_CLICKED(IDC_FILE_BROWSER_BUTTON, &MainDlg::OnFileBrowserClicked)
+    ON_BN_CLICKED(IDC_PREFERENCES_BUTTON, &MainDlg::OnPreferencesClicked)
 END_MESSAGE_MAP()
 
-CMainDlg::CMainDlg(CWnd* pParent /*=nullptr*/)
-    : CDialogEx(IDD_MAIN_DIALOG, pParent), m_pFileBrowserDlg(nullptr), m_pPreferencesDlg(nullptr), m_pCommandAliasDlg(nullptr) {}
+MainDlg::MainDlg(CWnd* pParent /*=nullptr*/)
+    : CDialogEx(IDD_MAINDIALOG, pParent)
+{
+}
 
-void CMainDlg::DoDataExchange(CDataExchange* pDX) {
+void MainDlg::DoDataExchange(CDataExchange* pDX)
+{
     CDialogEx::DoDataExchange(pDX);
 }
 
-BOOL CMainDlg::OnInitDialog() {
+BOOL MainDlg::OnInitDialog()
+{
     CDialogEx::OnInitDialog();
-    ApplyDarkTheme();  // Apply dark theme to the dialog
     return TRUE;
 }
 
-void CMainDlg::ApplyDarkTheme() {
-    SetBackgroundColor(RGB(30, 30, 30));  // Dark background color
-    CWnd* pChild = GetWindow(GW_CHILD);
-    while (pChild) {
-        pChild->SetTextColor(RGB(220, 220, 220));  // Light text color
-        pChild = pChild->GetNextWindow();
-    }
-    Invalidate();
+void MainDlg::OnCommandAliasClicked()
+{
+    CommandAliasDlg commandAliasDlg;
+    commandAliasDlg.DoModal();
 }
 
-void CMainDlg::OnBnClickedBrowse() {
-    if (!m_pFileBrowserDlg) {
-        m_pFileBrowserDlg = new CFileBrowserDlg(this);
-    }
-    m_pFileBrowserDlg->DoModal();
+void MainDlg::OnFileBrowserClicked()
+{
+    FileBrowserDlg fileBrowserDlg;
+    fileBrowserDlg.DoModal();
 }
 
-void CMainDlg::OnBnClickedPreferences() {
-    if (!m_pPreferencesDlg) {
-        m_pPreferencesDlg = new CPreferencesDlg(this);
-    }
-    m_pPreferencesDlg->DoModal();
-}
-
-void CMainDlg::OnBnClickedManageCommands() {
-    if (!m_pCommandAliasDlg) {
-        m_pCommandAliasDlg = new CCommandAliasDlg(this);
-    }
-    m_pCommandAliasDlg->DoModal();
+void MainDlg::OnPreferencesClicked()
+{
+    PreferencesDlg preferencesDlg;
+    preferencesDlg.DoModal();
 }

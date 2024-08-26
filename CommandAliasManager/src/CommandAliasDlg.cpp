@@ -1,89 +1,40 @@
-#include "stdafx.h"
 #include "CommandAliasDlg.h"
-#include "afxdialogex.h"
+#include <afxdlgs.h>
 
-BEGIN_MESSAGE_MAP(CCommandAliasDlg, CDialogEx)
-    ON_BN_CLICKED(IDC_ADD_COMMAND, &CCommandAliasDlg::OnBnClickedAdd)
-    ON_BN_CLICKED(IDC_EDIT_COMMAND, &CCommandAliasDlg::OnBnClickedEdit)
-    ON_BN_CLICKED(IDC_DELETE_COMMAND, &CCommandAliasDlg::OnBnClickedDelete)
-    ON_BN_CLICKED(IDC_ENABLE_COMMAND, &CCommandAliasDlg::OnBnClickedEnable)
-    ON_BN_CLICKED(IDC_DISABLE_COMMAND, &CCommandAliasDlg::OnBnClickedDisable)
-    ON_BN_CLICKED(IDC_IMPORT_COMMANDS, &CCommandAliasDlg::OnBnClickedImport)
-    ON_BN_CLICKED(IDC_EXPORT_COMMANDS, &CCommandAliasDlg::OnBnClickedExport)
+BEGIN_MESSAGE_MAP(CommandAliasDlg, CDialogEx)
+    ON_BN_CLICKED(IDC_ADD_COMMAND_BUTTON, &CommandAliasDlg::OnAddCommand)
+    ON_BN_CLICKED(IDC_EDIT_COMMAND_BUTTON, &CommandAliasDlg::OnEditCommand)
+    ON_BN_CLICKED(IDC_DELETE_COMMAND_BUTTON, &CommandAliasDlg::OnDeleteCommand)
 END_MESSAGE_MAP()
 
-CCommandAliasDlg::CCommandAliasDlg(CWnd* pParent /*=nullptr*/)
-    : CDialogEx(IDD_COMMAND_ALIAS_DIALOG, pParent) {}
-
-void CCommandAliasDlg::DoDataExchange(CDataExchange* pDX) {
-    CDialogEx::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_COMMAND_LIST, m_listCommands);
+CommandAliasDlg::CommandAliasDlg(CWnd* pParent /*=nullptr*/)
+    : CDialogEx(IDD_COMMANDALIASDIALOG, pParent)
+{
 }
 
-BOOL CCommandAliasDlg::OnInitDialog() {
+void CommandAliasDlg::DoDataExchange(CDataExchange* pDX)
+{
+    CDialogEx::DoDataExchange(pDX);
+}
+
+BOOL CommandAliasDlg::OnInitDialog()
+{
     CDialogEx::OnInitDialog();
-    ApplyDarkTheme();
-    LoadCommands();
-    UpdateCommandList();
+    // Initialize your controls here
     return TRUE;
 }
 
-void CCommandAliasDlg::ApplyDarkTheme() {
-    SetBackgroundColor(RGB(30, 30, 30));  // Dark background color
-    m_listCommands.SetTextColor(RGB(220, 220, 220));  // Light text color for list box
-    Invalidate();
+void CommandAliasDlg::OnAddCommand()
+{
+    // Logic to add a command or alias
 }
 
-void CCommandAliasDlg::UpdateCommandList() {
-    m_listCommands.ResetContent();
-    for (const auto& cmd : m_commands) {
-        m_listCommands.AddString(cmd.c_str());
-    }
+void CommandAliasDlg::OnEditCommand()
+{
+    // Logic to edit a command or alias
 }
 
-void CCommandAliasDlg::LoadCommands() {
-    // Load commands from file or registry
-    // Example: Load commands from a file
-    // m_commands.push_back(L"alias ls=dir");
-    // m_commands.push_back(L"alias rm=del");
-}
-
-void CCommandAliasDlg::SaveCommands() {
-    // Save commands to file or registry
-    // Example: Save commands to a file
-}
-
-void CCommandAliasDlg::OnBnClickedAdd() {
-    // Logic to add a new command
-    // For example, show an input dialog to enter the new command
-}
-
-void CCommandAliasDlg::OnBnClickedEdit() {
-    // Logic to edit a selected command
-    // For example, show an input dialog with the current command
-}
-
-void CCommandAliasDlg::OnBnClickedDelete() {
-    // Logic to delete a selected command
-    int sel = m_listCommands.GetCurSel();
-    if (sel != LB_ERR) {
-        m_commands.erase(m_commands.begin() + sel);
-        UpdateCommandList();
-    }
-}
-
-void CCommandAliasDlg::OnBnClickedEnable() {
-    // Logic to enable a selected command
-}
-
-void CCommandAliasDlg::OnBnClickedDisable() {
-    // Logic to disable a selected command
-}
-
-void CCommandAliasDlg::OnBnClickedImport() {
-    // Logic to import commands from a file
-}
-
-void CCommandAliasDlg::OnBnClickedExport() {
-    // Logic to export commands to a file
+void CommandAliasDlg::OnDeleteCommand()
+{
+    // Logic to delete a command or alias
 }

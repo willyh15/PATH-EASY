@@ -11,23 +11,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{PROJECT_GUID}</ProjectGuid>
+    <ProjectGuid>{24544200-D6EB-479C-AFE1-1CFB9D8173B6}</ProjectGuid>
     <RootNamespace>CommandAliasManagerApp</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <!-- Configuration for Debug x64 -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
+    <!-- Updated for Visual Studio 2022 -->
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <!-- Added to use MFC shared DLL -->
   </PropertyGroup>
+  <!-- Configuration for Release x64 -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
+    <!-- Updated for Visual Studio 2022 -->
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <!-- Added to use MFC shared DLL -->
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -36,12 +44,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <!-- ItemDefinitionGroup for Debug x64 -->
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_AFXDLL;_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <!-- Defined _AFXDLL -->
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -49,14 +59,16 @@
       <AdditionalDependencies>mfc140ud.lib;mfcs140ud.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <!-- ItemDefinitionGroup for Release x64 -->
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_AFXDLL;NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <!-- Defined _AFXDLL -->
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -66,16 +78,19 @@
       <AdditionalDependencies>mfc140u.lib;mfcs140u.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <!-- Source and Header Files -->
   <ItemGroup>
-    <ClInclude Include="..\include\CommandAliasDlg.h" />
-    <ClInclude Include="..\include\FileBrowserDlg.h" />
-    <ClInclude Include="..\include\MainDlg.h" />
-    <ClInclude Include="..\include\PreferencesDlg.h" />
-    <ClCompile Include="..\src\CommandAliasDlg.cpp" />
-    <ClCompile Include="..\src\FileBrowserDlg.cpp" />
-    <ClCompile Include="..\src\MainDlg.cpp" />
-    <ClCompile Include="..\src\PreferencesDlg.cpp" />
-    <ClCompile Include="..\src\MainApp.cpp" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="include\CommandAliasDlg.h" />
+    <ClInclude Include="include\FileBrowserDlg.h" />
+    <ClInclude Include="include\MainDlg.h" />
+    <ClInclude Include="include\PreferencesDlg.h" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="src\CommandAliasDlg.cpp" />
+    <ClCompile Include="src\FileBrowserDlg.cpp" />
+    <ClCompile Include="src\MainDlg.cpp" />
+    <ClCompile Include="src\PreferencesDlg.cpp" />
+    <ClCompile Include="src\MainApp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

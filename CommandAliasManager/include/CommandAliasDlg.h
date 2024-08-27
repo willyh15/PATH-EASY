@@ -1,7 +1,6 @@
 #pragma once
 #include "afxwin.h"
 #include <vector>
-#include <string>
 
 class CCommandAliasDlg : public CDialogEx {
 public:

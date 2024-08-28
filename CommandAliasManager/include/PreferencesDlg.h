@@ -1,31 +1,22 @@
 #pragma once
 
-#include <afxwin.h>  // MFC core and standard components
+#include "pch.h"
+#include <nana/gui.hpp>
+#include <nana/gui/widgets/form.hpp>
+#include <nana/gui/widgets/button.hpp>
+#include <nana/gui/widgets/textbox.hpp>
 
-class CPreferencesDlg : public CDialogEx {
+class CPreferencesDlg {
 public:
-    // Constructor for the Preferences dialog
-    CPreferencesDlg(CWnd* pParent = nullptr);
-    enum { IDD = IDD_PREFERENCES_DIALOG };  // Dialog ID defined in Resource.h
+    CPreferencesDlg();
+    ~CPreferencesDlg();
 
-protected:
-    // MFC override functions for dialog initialization and data exchange
-    virtual void DoDataExchange(CDataExchange* pDX) override;
-    virtual BOOL OnInitDialog() override;
+    void show();
 
 private:
-    // Variables for storing user preferences
-    int m_numRecentFiles;               // Number of recent files to remember
-    CString m_defaultFileTypeFilter;    // Default file type filter for file dialogs
+    void onSaveClicked();
 
-    // Methods to load and save preferences
-    void LoadPreferences();  // Load preferences from storage (e.g., registry, file)
-    void SavePreferences();  // Save preferences to storage
-
-    // Message handler for the OK button click
-    afx_msg void OnOK();
-
-    // Macro for declaring the message map in MFC
-    DECLARE_MESSAGE_MAP()
+    nana::form form_;
+    nana::textbox preferences_input_;
+    nana::button save_button_;
 };
-

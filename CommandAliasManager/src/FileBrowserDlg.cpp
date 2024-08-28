@@ -1,41 +1,48 @@
 #include "FileBrowserDlg.h"
-#include <afxdlgs.h>
 
-BEGIN_MESSAGE_MAP(FileBrowserDlg, CDialogEx)
-    ON_BN_CLICKED(IDC_BROWSE_BUTTON, &FileBrowserDlg::OnBrowse)
-END_MESSAGE_MAP()
+CFileBrowserDlg::CFileBrowserDlg() {
+    form_.caption("File Browser");
 
-FileBrowserDlg::FileBrowserDlg(CWnd* pParent /*=nullptr*/)
-    : CDialogEx(IDD_FILEBROWSERDIALOG, pParent)
-{
+    path_input_.create(form_);
+    browse_button_.create(form_);
+    file_list_.create(form_);
+
+    browse_button_.caption("Browse");
+    browse_button_.events().click([this] {
+        onBrowse();
+    });
+
+    form_.div("<vertical <path_input weight=10%><browse_button weight=10%><file_list weight=80%>>");
+    form_["path_input"] << path_input_;
+    form_["browse_button"] << browse_button_;
+    form_["file_list"] << file_list_;
+    form_.collocate();
 }
 
-void FileBrowserDlg::DoDataExchange(CDataExchange* pDX)
-{
-    CDialogEx::DoDataExchange(pDX);
+CFileBrowserDlg::~CFileBrowserDlg() {}
+
+void CFileBrowserDlg::show() {
+    form_.show();
+    nana::exec();
 }
 
-BOOL FileBrowserDlg::OnInitDialog()
-{
-    CDialogEx::OnInitDialog();
-    return TRUE;
-}
-
-void FileBrowserDlg::OnBrowse() {
-    try {
-        CFileDialog fileDlg(TRUE);
-        if (fileDlg.DoModal() == IDOK) {
-            CString filePath = fileDlg.GetPathName();
-            // Check if file exists
-            if (PathFileExists(filePath)) {
-                // Do something with the file path
-            } else {
-                AfxMessageBox(_T("The selected file does not exist."));
-            }
-        }
-    } catch (const std::exception& e) {
-        CString errorMessage;
-        errorMessage.Format(_T("An error occurred while browsing: %s"), CString(e.what()));
-        AfxMessageBox(errorMessage);
+void CFileBrowserDlg::onBrowse() {
+    boost::filesystem::path path(path_input_.caption());
+    if (boost::filesystem::exists(path) && boost::filesystem::is_directory(path)) {
+        updateFileList();
     }
+}
+
+void CFileBrowserDlg::updateFileList() {
+    file_list_.clear();
+    boost::filesystem::path path(path_input_.caption());
+    if (boost::filesystem::exists(path) && boost::filesystem::is_directory(path)) {
+        for (const auto& entry : boost::filesystem::directory_iterator(path)) {
+            file_list_.at(0).append(entry.path().string());
+        }
+    }
+}
+
+std::string CFileBrowserDlg::getSelectedFile() const {
+    return selected_file_;
 }

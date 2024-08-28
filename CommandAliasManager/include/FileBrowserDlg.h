@@ -1,36 +1,28 @@
 #pragma once
 
-#include <afxdlgs.h> // For CFileDialog
-#include <vector>    // For std::vector
-#include <string>    // For std::string
+#include "pch.h"
+#include <nana/gui.hpp>
+#include <nana/gui/widgets/form.hpp>
+#include <nana/gui/widgets/button.hpp>
+#include <nana/gui/widgets/textbox.hpp>
+#include <nana/gui/widgets/listbox.hpp>
+#include <boost/filesystem.hpp>
 
-class CFileBrowserDlg : public CFileDialog {
+class CFileBrowserDlg {
 public:
-    // Constructor: Initializes the file dialog box
-    CFileBrowserDlg(BOOL bOpenFileDialog, LPCTSTR lpszDefExt = nullptr, LPCTSTR lpszFileName = nullptr,
-                    DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, LPCTSTR lpszFilter = nullptr,
-                    CWnd* pParentWnd = nullptr);
+    CFileBrowserDlg();
+    ~CFileBrowserDlg();
 
-    // Getter for selected file
-    CString GetSelectedFile() const;
-
-    // Set the file type filter for the dialog
-    void SetFileTypeFilter(const CString& filter);
-
-    // Directory management functions
-    void RememberLastDirectory();
-    void LoadLastDirectory();
-
-    // Recent files management functions
-    void UpdateRecentFiles(const CString& file);
-    void LoadRecentFiles();
-    void SaveRecentFiles();
-    std::vector<CString> GetRecentFiles() const;
+    void show();
+    std::string getSelectedFile() const;
 
 private:
-    // Member variables for storing dialog state and recent files
-    CString m_selectedFile;      // Selected file path
-    CString m_lastDirectory;     // Last used directory
-    std::vector<CString> m_recentFiles; // List of recent files
-    CString m_fileTypeFilter;    // File type filter for the dialog
+    void onBrowse();
+    void updateFileList();
+
+    nana::form form_;
+    nana::textbox path_input_;
+    nana::button browse_button_;
+    nana::listbox file_list_;
+    std::string selected_file_;
 };

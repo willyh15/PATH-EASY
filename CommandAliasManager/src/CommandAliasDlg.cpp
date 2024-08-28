@@ -1,116 +1,81 @@
-#include "pch.h" // Ensure this is the first include if using precompiled headers
 #include "CommandAliasDlg.h"
-#include "Resource.h"
-#include <afxdlgs.h>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <fstream>
-#include <sstream>
-#include <afxwin.h> // Make sure this is included for MFC classes
 
-BEGIN_MESSAGE_MAP(CCommandAliasDlg, CDialogEx)
-    ON_BN_CLICKED(IDC_ADD_COMMAND_BUTTON, &CCommandAliasDlg::OnBnClickedAdd)
-    ON_BN_CLICKED(IDC_EDIT_COMMAND_BUTTON, &CCommandAliasDlg::OnBnClickedEdit)
-    ON_BN_CLICKED(IDC_DELETE_COMMAND_BUTTON, &CCommandAliasDlg::OnBnClickedDelete)
-END_MESSAGE_MAP()
-
-CCommandAliasDlg::CCommandAliasDlg(CWnd* pParent /*=nullptr*/)
-    : CDialogEx(IDD_COMMAND_ALIAS_DIALOG, pParent)  // Use correct enum for dialog ID
-{
-}
-
-void CCommandAliasDlg::DoDataExchange(CDataExchange* pDX)
-{
-    CDialogEx::DoDataExchange(pDX);
-    DDX_Control(pDX, IDC_LIST_COMMANDS, m_listCommands);  // Link the list box control
-    DDX_Control(pDX, IDC_COMMAND_INPUT, m_commandInput);  // Link the command input control
-}
-
-BOOL CCommandAliasDlg::OnInitDialog()
-{
-    CDialogEx::OnInitDialog();
+CCommandAliasDlg::CCommandAliasDlg() {
+    form_.caption("Command Alias Manager");
     
-    // Initialize your controls and load commands
-    LoadCommands();
-    UpdateCommandList();
+    list_commands_.create(form_);
+    list_commands_.append_header("Commands", 150);
 
-    return TRUE;  // Return TRUE unless you set the focus to a control
-}
+    command_input_.create(form_);
 
-void CCommandAliasDlg::OnBnClickedAdd()
-{
-    CString newCommand;
-    m_commandInput.GetWindowText(newCommand);
-
-    if (!newCommand.IsEmpty()) {
-        m_commands.push_back(newCommand.GetString());
-        UpdateCommandList();
-        SaveCommands();
-    } else {
-        AfxMessageBox(_T("Command cannot be empty!"));
-    }
-}
-
-void CCommandAliasDlg::UpdateCommandList()
-{
-    m_listCommands.ResetContent();
-    for (const auto& cmd : m_commands) {
-        m_listCommands.AddString(cmd.c_str());
-    }
-}
-
-void CCommandAliasDlg::OnBnClickedEdit()
-{
-    // Logic to edit a command or alias
-    int selIndex = m_listCommands.GetCurSel();
-    if (selIndex != LB_ERR) {
-        CString selectedCommand;
-        m_listCommands.GetText(selIndex, selectedCommand);
-        // Open an edit dialog or modify the selected command
-    }
-}
-
-void CCommandAliasDlg::OnBnClickedDelete()
-{
-    // Logic to delete a command or alias
-    int selIndex = m_listCommands.GetCurSel();
-    if (selIndex != LB_ERR) {
-        m_commands.erase(m_commands.begin() + selIndex);
-        UpdateCommandList();
-        SaveCommands();
-    }
-}
-
-void CCommandAliasDlg::LoadCommands()
-{
-    std::ifstream infile("commands.txt");  // Use absolute path if necessary
-
-    if (!infile.is_open()) {
-        AfxMessageBox(_T("Failed to open commands file for loading."));
-        return;
-    }
-
-    m_commands.clear();
-    std::wstring line;
-    while (std::getline(infile, line)) {
-        if (!line.empty()) {
-            m_commands.push_back(line);
+    btn_add_.create(form_);
+    btn_add_.caption("Add");
+    btn_add_.events().click([this] {
+        std::wstring command = command_input_.caption_wstring();
+        if (!command.empty()) {
+            addCommand(command);
+            command_input_.caption(L"");
         }
-    }
+    });
 
-    infile.close();
+    btn_edit_.create(form_);
+    btn_edit_.caption("Edit");
+    btn_edit_.events().click([this] {
+        auto index = list_commands_.selected();
+        if (!index.empty()) {
+            auto selected = index.front();
+            editCommand(selected.item, command_input_.caption_wstring());
+        }
+    });
+
+    btn_delete_.create(form_);
+    btn_delete_.caption("Delete");
+    btn_delete_.events().click([this] {
+        auto index = list_commands_.selected();
+        if (!index.empty()) {
+            auto selected = index.front();
+            deleteCommand(selected.item);
+        }
+    });
+
+    // Layout
+    form_.div("<vertical <list_commands weight=80%> <weight=10% <command_input> <weight=10% <btn_add> <btn_edit> <btn_delete>>>>");
+    form_["list_commands"] << list_commands_;
+    form_["command_input"] << command_input_;
+    form_["btn_add"] << btn_add_;
+    form_["btn_edit"] << btn_edit_;
+    form_["btn_delete"] << btn_delete_;
+    form_.collocate();
 }
 
-void CCommandAliasDlg::SaveCommands()
-{
-    std::ofstream outfile("commands.txt");  // Use absolute path if necessary
+CCommandAliasDlg::~CCommandAliasDlg() {}
 
-    if (!outfile.is_open()) {
-        AfxMessageBox(_T("Failed to open commands file for saving."));
-        return;
+void CCommandAliasDlg::show() {
+    form_.show();
+    nana::exec();
+}
+
+void CCommandAliasDlg::addCommand(const std::wstring& command) {
+    commands_.push_back(command);
+    list_commands_.at(0).append(command);
+    // SaveCommands(); // Implement saving logic using Boost or standard C++ I/O
+}
+
+void CCommandAliasDlg::editCommand(size_t index, const std::wstring& command) {
+    if (index < commands_.size()) {
+        commands_[index] = command;
+        list_commands_.at(0).at(index).text(command);
+        // SaveCommands();
     }
+}
 
-    for (const auto& cmd : m_commands) {
-        outfile << cmd << std::endl;
+void CCommandAliasDlg::deleteCommand(size_t index) {
+    if (index < commands_.size()) {
+        commands_.erase(commands_.begin() + index);
+        list_commands_.at(0).erase(index);
+        // SaveCommands();
     }
-
-    outfile.close();
 }

@@ -1,66 +1,48 @@
-#include "stdafx.h"
-#include "MainApp.h"
 #include "MainDlg.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
+CMainDlg::CMainDlg() {
+    form_.caption("Main Dialog");
 
-BEGIN_MESSAGE_MAP(CMainApp, CWinApp)
-END_MESSAGE_MAP()
+    browse_button_.create(form_);
+    preferences_button_.create(form_);
+    manage_commands_button_.create(form_);
 
-CMainApp::CMainApp() : m_bDarkModeEnabled(TRUE) {}
+    browse_button_.caption("Browse");
+    preferences_button_.caption("Preferences");
+    manage_commands_button_.caption("Manage Commands");
 
-CMainApp theApp;
+    browse_button_.events().click([this] {
+        onBrowseClicked();
+    });
+    preferences_button_.events().click([this] {
+        onPreferencesClicked();
+    });
+    manage_commands_button_.events().click([this] {
+        onManageCommandsClicked();
+    });
 
-BOOL CMainApp::InitInstance() {
-    CWinApp::InitInstance();
-
-    // Enable dark mode
-    EnableDarkMode();
-
-    // Create main dialog
-    CMainDlg dlg;
-    m_pMainWnd = &dlg;
-    ApplyDarkTheme(m_pMainWnd);  // Apply dark theme to the main dialog
-    INT_PTR nResponse = dlg.DoModal();
-    if (nResponse == IDOK) {
-        // Handle dialog OK
-    } else if (nResponse == IDCANCEL) {
-        // Handle dialog cancel
-    }
-
-    return FALSE;
+    form_.div("<vertical <browse_button><preferences_button><manage_commands_button>>");
+    form_["browse_button"] << browse_button_;
+    form_["preferences_button"] << preferences_button_;
+    form_["manage_commands_button"] << manage_commands_button_;
+    form_.collocate();
 }
 
-void CMainApp::EnableDarkMode() {
-    // This function enables the dark mode for the application.
-    // You might want to use Windows API or custom drawing code to set dark mode here.
-    // For example, use Windows 10+ dark mode APIs if available.
-    // Below is a pseudo-code representation:
-    m_bDarkModeEnabled = TRUE;  // Set your flag for dark mode
-    // Apply dark mode to all existing windows
-    POSITION pos = m_pMainWnd->GetFirstChildWindow();
-    while (pos) {
-        CWnd* pWnd = m_pMainWnd->GetNextChildWindow(pos);
-        ApplyDarkTheme(pWnd);
-    }
+CMainDlg::~CMainDlg() {}
+
+void CMainDlg::show() {
+    form_.show();
+    nana::exec();
 }
 
-void CMainApp::ApplyDarkTheme(CWnd* pWnd) {
-    if (!pWnd || !m_bDarkModeEnabled) return;
+void CMainDlg::onBrowseClicked() {
+    file_browser_dlg_.show();
+}
 
-    // Apply dark theme settings to the window
-    pWnd->ModifyStyleEx(0, WS_EX_COMPOSITED);  // Enable double buffering
-    pWnd->SetBackgroundColor(RGB(30, 30, 30)); // Dark background
+void CMainDlg::onPreferencesClicked() {
+    preferences_dlg_.show();
+}
 
-    // Update controls' appearances
-    CWnd* pChild = pWnd->GetWindow(GW_CHILD);
-    while (pChild) {
-        pChild->SetTextColor(RGB(220, 220, 220)); // Light text color
-        pChild = pChild->GetNextWindow();
-    }
-
-    // Apply to child dialogs and controls
-    pWnd->Invalidate();
+void CMainDlg::onManageCommandsClicked() {
+    command_alias_dlg_.show();
 }

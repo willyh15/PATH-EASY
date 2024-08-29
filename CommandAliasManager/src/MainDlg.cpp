@@ -117,6 +117,28 @@ void CMainDlg::show() {
     nana::exec();
 }
 
+// Function to scan directories and suggest paths
+void CMainDlg::scanAndSuggestPaths() {
+    std::vector<std::string> common_dirs = {"C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32"};
+    std::set<std::string> suggestions;
+
+    for (const auto& dir : common_dirs) {
+        if (boost::filesystem::exists(dir)) {
+            for (boost::filesystem::recursive_directory_iterator it(dir), end; it != end; ++it) {
+                if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) {
+                    suggestions.insert(it->path().string());
+                }
+            }
+        }
+    }
+
+    // Update the UI with suggestions
+    path_input_combo_.clear();
+    for (const auto& suggestion : suggestions) {
+        path_input_combo_.push_back(suggestion);
+    }
+}
+
 // Event handler for "Add to PATH" button
 void CMainDlg::onAddToPathClicked() {
     std::string directory = path_input_combo_.caption(); // Get input from combobox

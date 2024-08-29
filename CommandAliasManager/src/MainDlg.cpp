@@ -139,6 +139,27 @@ void CMainDlg::scanAndSuggestPaths() {
     }
 }
 
+// Batch add directories to PATH
+void CMainDlg::onBatchAddToPathClicked() {
+    std::vector<std::string> directories = { "C:\\Dir1", "C:\\Dir2", "C:\\Dir3" }; // Example input
+    for (const auto& dir : directories) {
+        PathManager::AddToPath(dir);
+    }
+}
+
+// Bulk alias creation
+void CMainDlg::onBulkAliasCreationClicked() {
+    std::vector<std::pair<std::string, std::string>> aliases = {
+        {"ll", "ls -l"},
+        {"gs", "git status"},
+        {"..", "cd .."}
+    }; // Example input
+
+    for (const auto& [alias, command] : aliases) {
+        AliasManager::CreateBatchAlias(alias, command);
+    }
+}
+
 // Event handler for "Add to PATH" button
 void CMainDlg::onAddToPathClicked() {
     std::string directory = path_input_combo_.caption(); // Get input from combobox

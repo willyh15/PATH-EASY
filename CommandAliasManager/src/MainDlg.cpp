@@ -1,5 +1,4 @@
 #include "MainDlg.h"
-#include <regex>
 #include "AliasManager.h"
 #include "PathManager.h"
 #include <nana/gui.hpp>
@@ -11,11 +10,8 @@
 #include <nana/gui/widgets/treebox.hpp>  // Include treebox for directory navigation
 #include <nana/gui/msgbox.hpp>
 #include <boost/filesystem.hpp>
-#include <windows.h>
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <thread>
 #include <chrono>
 
 // Constructor for the main dialog
@@ -118,113 +114,9 @@ void CMainDlg::show() {
     nana::exec();
 }
 
-// Function to translate custom alias syntax to shell syntax
-std::string AliasManager::translateAlias(const std::string& aliasDefinition) {
-    // Example: Translate "open <path>" to "start <path>" for CMD
-    std::regex openPattern(R"(^open\s+(.+))");
-    if (std::regex_match(aliasDefinition, openPattern)) {
-        return "start " + aliasDefinition.substr(5); // Replace 'open' with 'start'
-    }
-    // Add more patterns as needed
-    return aliasDefinition; // Default to the original input
-}
-
-// In MainDlg.cpp
-void CMainDlg::onSearchTextChanged() {
-    std::string query = search_input_.caption();
-    // Filter aliases or PATH entries based on the query
-    alias_list_.clear();
-    Json::Value aliases = AliasManager::LoadAliases();
-    for (const auto& alias : aliases.getMemberNames()) {
-        if (alias.find(query) != std::string::npos) {
-            alias_list_.at(0).append({ alias, aliases[alias].asString() });
-        }
-    }
-}
-
-// Function to scan directories and suggest paths
-void CMainDlg::scanAndSuggestPaths() {
-    std::vector<std::string> common_dirs = {"C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32"};
-    std::set<std::string> suggestions;
-
-    for (const auto& dir : common_dirs) {
-        if (boost::filesystem::exists(dir)) {
-            for (boost::filesystem::recursive_directory_iterator it(dir), end; it != end; ++it) {
-                if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) {
-                    suggestions.insert(it->path().string());
-                }
-            }
-        }
-    }
-
-    // Update the UI with suggestions
-    path_input_combo_.clear();
-    for (const auto& suggestion : suggestions) {
-        path_input_combo_.push_back(suggestion);
-    }
-}
-
-// Batch add directories to PATH
-void CMainDlg::onBatchAddToPathClicked() {
-    std::vector<std::string> directories = { "C:\\Dir1", "C:\\Dir2", "C:\\Dir3" }; // Example input
-    for (const auto& dir : directories) {
-        PathManager::AddToPath(dir);
-    }
-}
-
-// In MainDlg.cpp
-void CMainDlg::onSettingsClicked() {
-    // Create and show the settings dialog
-    CSettingsDlg settingsDialog;
-    settingsDialog.show();
-}
-
-// In CSettingsDlg.cpp
-CSettingsDlg::CSettingsDlg() {
-    form_.caption("Settings");
-
-    // Create UI elements for settings
-    default_dir_input_.create(form_);
-    alias_syntax_combo_.create(form_);
-    
-    // Populate UI elements with current settings
-    default_dir_input_.caption(settings_.default_directory);
-    alias_syntax_combo_.push_back("CMD");
-    alias_syntax_combo_.push_back("PowerShell");
-    alias_syntax_combo_.option(settings_.alias_syntax == "CMD" ? 0 : 1);
-
-    // Event handlers to save settings
-    save_button_.events().click([this] {
-        settings_.default_directory = default_dir_input_.caption();
-        settings_.alias_syntax = alias_syntax_combo_.caption();
-        saveSettings();
-        form_.close();
-    });
-
-    // Layout
-    form_.div("<vertical <default_dir_input><alias_syntax_combo><save_button>>");
-    form_["default_dir_input"] << default_dir_input_;
-    form_["alias_syntax_combo"] << alias_syntax_combo_;
-    form_["save_button"] << save_button_;
-    form_.collocate();
-}
-
-// Bulk alias creation
-void CMainDlg::onBulkAliasCreationClicked() {
-    std::vector<std::pair<std::string, std::string>> aliases = {
-        {"ll", "ls -l"},
-        {"gs", "git status"},
-        {"..", "cd .."}
-    }; // Example input
-
-    for (const auto& [alias, command] : aliases) {
-        AliasManager::CreateBatchAlias(alias, command);
-    }
-}
-
 // Event handler for "Add to PATH" button
 void CMainDlg::onAddToPathClicked() {
-    std::string directory = path_input_combo_.caption(); // Get input from combobox
+    std::string directory = path_input_combo_.caption();
     if (directory.empty()) {
         nana::msgbox m(form_, "Error");
         m << "Please enter a valid directory.";
@@ -243,8 +135,8 @@ void CMainDlg::onAddToPathClicked() {
 
 // Event handler for "Add Alias" button
 void CMainDlg::onAddAliasClicked() {
-    std::string alias = alias_input_.caption();  // Get input from textbox
-    std::string command = command_input_combo_.caption(); // Get input from combobox
+    std::string alias = alias_input_.caption();
+    std::string command = command_input_combo_.caption();
     if (alias.empty() || command.empty()) {
         nana::msgbox m(form_, "Error");
         m << "Please enter both alias and command.";
@@ -284,28 +176,28 @@ void CMainDlg::onAddAliasClicked() {
 
 // Event handler for path input text change with limited depth search and debounce
 void CMainDlg::onPathInputChanged() {
-    std::string input = path_input_combo_.caption(); // Get current input
-    path_input_combo_.clear(); // Clear previous suggestions
+    std::string input = path_input_combo_.caption();
+    path_input_combo_.clear();
 
-    if (input.length() < 2) return; // Start suggesting after at least 2 characters
+    if (input.length() < 2) return;
 
-    boost::filesystem::path search_path(path_input_combo_.caption()); // Start from the selected directory
-    bool found_any = false; // To track if any suggestions are found
-    int max_depth = 2; // Limit depth of recursion
+    boost::filesystem::path search_path(path_input_combo_.caption());
+    bool found_any = false;
+    int max_depth = 2;
 
     try {
         for (boost::filesystem::recursive_directory_iterator it(search_path), end; it != end; ++it) {
             if (boost::filesystem::is_directory(it->path())) {
-                if (it.level() > max_depth) { // Check if the current level exceeds the max depth
-                    it.pop(); // Skip further processing in this directory
+                if (it.level() > max_depth) {
+                    it.pop();
                     continue;
                 }
             }
 
-            if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) { // Check for .exe files only
+            if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) {
                 std::string entry_name = it->path().filename().string();
-                if (entry_name.find(input) != std::string::npos) { // If entry matches input
-                    path_input_combo_.push_back(entry_name); // Add suggestion
+                if (entry_name.find(input) != std::string::npos) {
+                    path_input_combo_.push_back(entry_name);
                     found_any = true;
                 }
             }
@@ -317,7 +209,7 @@ void CMainDlg::onPathInputChanged() {
         return;
     }
 
-    if (!found_any) { // If no matches found
+    if (!found_any) {
         nana::msgbox m(form_, "No Matches");
         m << "No matching executable files found.";
         m.show();
@@ -336,3 +228,5 @@ void CMainDlg::onPreferencesClicked() {
 void CMainDlg::onManageCommandsClicked() {
     command_alias_dlg_.show();
 }
+
+// Additional methods related to UI functionalities (e.g., directory scanning, settings) should remain here

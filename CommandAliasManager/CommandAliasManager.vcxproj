@@ -23,6 +23,8 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <IncludePath>$(VcpkgRoot)installed\x64-windows\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VcpkgRoot)installed\x64-windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   
   <!-- Configuration for Release x64 -->
@@ -32,6 +34,8 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <IncludePath>$(VcpkgRoot)installed\x64-windows\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VcpkgRoot)installed\x64-windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -51,7 +55,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-         <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,12 +89,12 @@
     <ClInclude Include="include\FileBrowserDlg.h" />
     <ClInclude Include="include\MainDlg.h" />
     <ClInclude Include="include\PreferencesDlg.h" />
+    <ClInclude Include="include\pch.h" /> <!-- Precompiled header -->
     <ClCompile Include="src\CommandAliasDlg.cpp" />
     <ClCompile Include="src\FileBrowserDlg.cpp" />
     <ClCompile Include="src\MainDlg.cpp" />
     <ClCompile Include="src\PreferencesDlg.cpp" />
     <ClCompile Include="src\MainApp.cpp" />
-    <ClInclude Include="include\pch.h" /> <!-- Precompiled header -->
     <ClCompile Include="src\pch.cpp" /> <!-- Precompiled header source -->
   </ItemGroup>
   

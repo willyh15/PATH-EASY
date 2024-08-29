@@ -1,16 +1,15 @@
 #pragma once
 
-#include <afxwin.h>
-#include <afxdlgs.h>
+// Remove MFC includes
+// #include <afxwin.h>
+// #include <afxdlgs.h>
+
+// Add Nana and Boost includes
+#include <nana/gui.hpp>
+#include <nana/gui/widgets/button.hpp>
+#include <nana/gui/widgets/label.hpp>
+#include <nana/gui/widgets/form.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>
-
-// Boost libraries
-#include <boost/filesystem.hpp>  // Example: Boost Filesystem for path manipulations
-#include <boost/program_options.hpp>  // Example: Boost Program Options for command-line handling
-
-// Nana GUI library
-#include <nana/gui.hpp>  // Core Nana GUI components
-#include <nana/gui/widgets/button.hpp>  // Example: Nana button widget
-
-// Add other Boost or Nana headers as needed for your project

@@ -1,59 +1,19 @@
 #include "MainDlg.h"
+#include "AliasManager.h"  // Include for alias management logic
+#include "PathManager.h"   // Include for path management logic
 #include <nana/gui.hpp>
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/textbox.hpp>
-#include <nana/gui/widgets/combox.hpp> // Include combox for autocomplete
-#include <nana/gui/widgets/label.hpp>  // Include label for directory selection
-#include <nana/gui/widgets/listbox.hpp> // Include listbox for directory selection
+#include <nana/gui/widgets/combox.hpp>
+#include <nana/gui/widgets/label.hpp>
+#include <nana/gui/widgets/listbox.hpp>
 #include <nana/gui/msgbox.hpp>
-#include <boost/filesystem.hpp> // Include Boost for filesystem operations
+#include <boost/filesystem.hpp>
 #include <windows.h>
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <thread> // For debounce mechanism
+#include <thread>
 #include <chrono>
-
-// Helper function to add a directory to the PATH
-bool AddToPath(const std::string& directory) {
-    std::string path;
-    char* buffer = nullptr;
-    size_t size = 0;
-
-    // Get the current PATH
-    if (_dupenv_s(&buffer, &size, "PATH") == 0 && buffer != nullptr) {
-        path = buffer;
-        free(buffer);
-    }
-
-    // Check if the directory is already in the PATH
-    if (path.find(directory) != std::string::npos) {
-        std::cout << "Directory is already in PATH." << std::endl;
-        return false;
-    }
-
-    // Append the new directory to the PATH
-    path += ";" + directory;
-    if (_putenv_s("PATH", path.c_str()) != 0) {
-        std::cerr << "Failed to update PATH." << std::endl;
-        return false;
-    }
-
-    std::cout << "Successfully added to PATH." << std::endl;
-    return true;
-}
-
-// Helper function to create a batch alias
-void CreateBatchAlias(const std::string& alias, const std::string& command) {
-    std::ofstream batchFile("alias.bat", std::ios::app);
-    if (batchFile.is_open()) {
-        batchFile << "doskey " << alias << "=" << command << "\n";
-        batchFile.close();
-        std::cout << "Alias created successfully." << std::endl;
-    } else {
-        std::cerr << "Unable to open batch file." << std::endl;
-    }
-}
 
 // Constructor for the main dialog
 CMainDlg::CMainDlg() {
@@ -76,7 +36,7 @@ CMainDlg::CMainDlg() {
     // Create textboxes and combox for path input with autocomplete
     path_input_combo_.create(form_);
     alias_input_.create(form_);
-    command_input_.create(form_);
+    command_input_combo_.create(form_);  // Renamed from command_input_ to command_input_combo_ for consistency
 
     // Create a listbox for directory selection
     directory_list_.create(form_);
@@ -88,7 +48,7 @@ CMainDlg::CMainDlg() {
     // Set placeholders for textboxes
     path_input_combo_.tip_string("Enter directory path...");
     alias_input_.tip_string("Enter alias...");
-    command_input_.tip_string("Enter command...");
+    command_input_combo_.tip_string("Enter command...");
 
     // Define event handlers for buttons
     browse_button_.events().click([this] {
@@ -128,7 +88,7 @@ CMainDlg::CMainDlg() {
     // Set layout for the form
     form_.div("<vertical <browse_button><preferences_button><manage_commands_button>"
               "<weight=10% <path_input_combo><add_to_path_button>>"
-              "<weight=10% <alias_input><command_input><add_alias_button>>"
+              "<weight=10% <alias_input><command_input_combo><add_alias_button>>"
               "<weight=20% <directory_list>>");
     form_["browse_button"] << browse_button_;
     form_["preferences_button"] << preferences_button_;
@@ -136,7 +96,7 @@ CMainDlg::CMainDlg() {
     form_["path_input_combo"] << path_input_combo_;
     form_["add_to_path_button"] << add_to_path_button_;
     form_["alias_input"] << alias_input_;
-    form_["command_input"] << command_input_;
+    form_["command_input_combo"] << command_input_combo_;
     form_["add_alias_button"] << add_alias_button_;
     form_["directory_list"] << directory_list_;
     form_.collocate();
@@ -161,7 +121,7 @@ void CMainDlg::onAddToPathClicked() {
         return;
     }
 
-    if (AddToPath(directory)) {
+    if (PathManager::AddToPath(directory)) {  // Delegated to PathManager
         nana::msgbox m(form_, "Success");
         m << "Path added successfully.";
         m.show();
@@ -175,7 +135,7 @@ void CMainDlg::onAddToPathClicked() {
 // Event handler for "Add Alias" button
 void CMainDlg::onAddAliasClicked() {
     std::string alias = alias_input_.caption();  // Get input from textbox
-    std::string command = command_input_.caption(); // Get input from textbox
+    std::string command = command_input_combo_.caption(); // Get input from combobox
     if (alias.empty() || command.empty()) {
         nana::msgbox m(form_, "Error");
         m << "Please enter both alias and command.";
@@ -183,7 +143,31 @@ void CMainDlg::onAddAliasClicked() {
         return;
     }
 
-    CreateBatchAlias(alias, command);
+    if (alias.find(' ') != std::string::npos || alias.find('=') != std::string::npos) {
+        nana::msgbox m(form_, "Error");
+        m << "Alias name cannot contain spaces or '='.";
+        m.show();
+        return;
+    }
+
+    if (AliasManager::AliasExists(alias)) {  // Check if alias exists
+        nana::msgbox m(form_, "Alias Exists");
+        m << "An alias with this name already exists. Do you want to overwrite it?";
+        m << nana::msgbox::yes_no;
+        if (m.show() == nana::msgbox::pick_no) {
+            return;
+        }
+    }
+
+    AliasManager::CreateBatchAlias(alias, command);  // Create or update alias
+
+    // Update alias list in GUI
+    alias_list_.clear();
+    Json::Value aliases = AliasManager::LoadAliases();
+    for (const auto& alias : aliases.getMemberNames()) {
+        alias_list_.at(0).append({ alias, aliases[alias].asString() });
+    }
+
     nana::msgbox m(form_, "Alias Created");
     m << "Alias created successfully.";
     m.show();

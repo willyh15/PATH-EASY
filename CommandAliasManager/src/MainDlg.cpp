@@ -160,6 +160,43 @@ void CMainDlg::onBatchAddToPathClicked() {
     }
 }
 
+// In MainDlg.cpp
+void CMainDlg::onSettingsClicked() {
+    // Create and show the settings dialog
+    CSettingsDlg settingsDialog;
+    settingsDialog.show();
+}
+
+// In CSettingsDlg.cpp
+CSettingsDlg::CSettingsDlg() {
+    form_.caption("Settings");
+
+    // Create UI elements for settings
+    default_dir_input_.create(form_);
+    alias_syntax_combo_.create(form_);
+    
+    // Populate UI elements with current settings
+    default_dir_input_.caption(settings_.default_directory);
+    alias_syntax_combo_.push_back("CMD");
+    alias_syntax_combo_.push_back("PowerShell");
+    alias_syntax_combo_.option(settings_.alias_syntax == "CMD" ? 0 : 1);
+
+    // Event handlers to save settings
+    save_button_.events().click([this] {
+        settings_.default_directory = default_dir_input_.caption();
+        settings_.alias_syntax = alias_syntax_combo_.caption();
+        saveSettings();
+        form_.close();
+    });
+
+    // Layout
+    form_.div("<vertical <default_dir_input><alias_syntax_combo><save_button>>");
+    form_["default_dir_input"] << default_dir_input_;
+    form_["alias_syntax_combo"] << alias_syntax_combo_;
+    form_["save_button"] << save_button_;
+    form_.collocate();
+}
+
 // Bulk alias creation
 void CMainDlg::onBulkAliasCreationClicked() {
     std::vector<std::pair<std::string, std::string>> aliases = {

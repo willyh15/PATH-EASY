@@ -1,4 +1,5 @@
 #include "MainDlg.h"
+#include <regex>
 #include "AliasManager.h"
 #include "PathManager.h"
 #include <nana/gui.hpp>

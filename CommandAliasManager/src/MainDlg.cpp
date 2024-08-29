@@ -117,6 +117,19 @@ void CMainDlg::show() {
     nana::exec();
 }
 
+// In MainDlg.cpp
+void CMainDlg::onSearchTextChanged() {
+    std::string query = search_input_.caption();
+    // Filter aliases or PATH entries based on the query
+    alias_list_.clear();
+    Json::Value aliases = AliasManager::LoadAliases();
+    for (const auto& alias : aliases.getMemberNames()) {
+        if (alias.find(query) != std::string::npos) {
+            alias_list_.at(0).append({ alias, aliases[alias].asString() });
+        }
+    }
+}
+
 // Function to scan directories and suggest paths
 void CMainDlg::scanAndSuggestPaths() {
     std::vector<std::string> common_dirs = {"C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32"};

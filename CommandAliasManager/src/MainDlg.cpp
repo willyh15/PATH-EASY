@@ -1,17 +1,19 @@
 #include "MainDlg.h"
-#include "AliasManager.h"  // Include for alias management logic
-#include "PathManager.h"   // Include for path management logic
+#include "AliasManager.h"
+#include "PathManager.h"
 #include <nana/gui.hpp>
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/textbox.hpp>
 #include <nana/gui/widgets/combox.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
+#include <nana/gui/widgets/treebox.hpp>  // Include treebox for directory navigation
 #include <nana/gui/msgbox.hpp>
 #include <boost/filesystem.hpp>
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <fstream>
 #include <thread>
 #include <chrono>
 
@@ -36,10 +38,13 @@ CMainDlg::CMainDlg() {
     // Create textboxes and combox for path input with autocomplete
     path_input_combo_.create(form_);
     alias_input_.create(form_);
-    command_input_combo_.create(form_);  // Renamed from command_input_ to command_input_combo_ for consistency
+    command_input_combo_.create(form_);
 
     // Create a listbox for directory selection
     directory_list_.create(form_);
+
+    // Create a treebox for file explorer-like directory navigation
+    directory_tree_.create(form_);
 
     // Populate the listbox with commonly used directories
     directory_list_.append_header("Common Directories", 200);
@@ -89,7 +94,7 @@ CMainDlg::CMainDlg() {
     form_.div("<vertical <browse_button><preferences_button><manage_commands_button>"
               "<weight=10% <path_input_combo><add_to_path_button>>"
               "<weight=10% <alias_input><command_input_combo><add_alias_button>>"
-              "<weight=20% <directory_list>>");
+              "<weight=20% <directory_list><directory_tree>>");
     form_["browse_button"] << browse_button_;
     form_["preferences_button"] << preferences_button_;
     form_["manage_commands_button"] << manage_commands_button_;
@@ -99,6 +104,7 @@ CMainDlg::CMainDlg() {
     form_["command_input_combo"] << command_input_combo_;
     form_["add_alias_button"] << add_alias_button_;
     form_["directory_list"] << directory_list_;
+    form_["directory_tree"] << directory_tree_;
     form_.collocate();
 }
 
@@ -121,14 +127,12 @@ void CMainDlg::onAddToPathClicked() {
         return;
     }
 
-    if (PathManager::AddToPath(directory)) {  // Delegated to PathManager
+    if (PathManager::AddToPath(directory)) {
         nana::msgbox m(form_, "Success");
         m << "Path added successfully.";
         m.show();
     } else {
-        nana::msgbox m(form_, "Error");
-        m << "Failed to add path.";
-        m.show();
+        // Error handling is now done in PathManager::AddToPath
     }
 }
 
@@ -150,7 +154,7 @@ void CMainDlg::onAddAliasClicked() {
         return;
     }
 
-    if (AliasManager::AliasExists(alias)) {  // Check if alias exists
+    if (AliasManager::AliasExists(alias)) {
         nana::msgbox m(form_, "Alias Exists");
         m << "An alias with this name already exists. Do you want to overwrite it?";
         m << nana::msgbox::yes_no;
@@ -159,7 +163,7 @@ void CMainDlg::onAddAliasClicked() {
         }
     }
 
-    AliasManager::CreateBatchAlias(alias, command);  // Create or update alias
+    AliasManager::CreateBatchAlias(alias, command);
 
     // Update alias list in GUI
     alias_list_.clear();

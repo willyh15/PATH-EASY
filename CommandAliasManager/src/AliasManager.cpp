@@ -2,6 +2,7 @@
 #include "AliasManager.h"
 #include <fstream>
 #include <nana/gui/msgbox.hpp>
+#include <regex>
 
 // Define the path for the aliases JSON file
 const std::string alias_file_path = "aliases.json";
@@ -55,4 +56,20 @@ void AliasManager::CreateBatchAlias(const std::string& alias, const std::string&
     Json::Value aliases = LoadAliases();
     aliases[alias] = command;
     SaveAliases(aliases);
+}
+
+// Translate custom alias syntax to shell syntax
+std::string AliasManager::translateAlias(const std::string& aliasDefinition) {
+    std::regex openPattern(R"(^open\s+(.+))");
+    if (std::regex_match(aliasDefinition, openPattern)) {
+        return "start " + aliasDefinition.substr(5);
+    }
+    return aliasDefinition;
+}
+
+// Function for bulk alias creation
+void AliasManager::BulkAliasCreation(const std::vector<std::pair<std::string, std::string>>& aliases) {
+    for (const auto& [alias, command] : aliases) {
+        CreateBatchAlias(alias, command);
+    }
 }

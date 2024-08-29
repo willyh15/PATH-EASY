@@ -118,6 +118,17 @@ void CMainDlg::show() {
     nana::exec();
 }
 
+// Function to translate custom alias syntax to shell syntax
+std::string AliasManager::translateAlias(const std::string& aliasDefinition) {
+    // Example: Translate "open <path>" to "start <path>" for CMD
+    std::regex openPattern(R"(^open\s+(.+))");
+    if (std::regex_match(aliasDefinition, openPattern)) {
+        return "start " + aliasDefinition.substr(5); // Replace 'open' with 'start'
+    }
+    // Add more patterns as needed
+    return aliasDefinition; // Default to the original input
+}
+
 // In MainDlg.cpp
 void CMainDlg::onSearchTextChanged() {
     std::string query = search_input_.caption();

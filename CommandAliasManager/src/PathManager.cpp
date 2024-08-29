@@ -43,3 +43,28 @@ bool PathManager::AddToPath(const std::string& directory) {
     m.show();
     return true;
 }
+
+// Function to scan directories and suggest paths
+std::set<std::string> PathManager::scanAndSuggestPaths() {
+    std::vector<std::string> common_dirs = {"C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32"};
+    std::set<std::string> suggestions;
+
+    for (const auto& dir : common_dirs) {
+        if (boost::filesystem::exists(dir)) {
+            for (boost::filesystem::recursive_directory_iterator it(dir), end; it != end; ++it) {
+                if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) {
+                    suggestions.insert(it->path().string());
+                }
+            }
+        }
+    }
+
+    return suggestions;
+}
+
+// Batch add directories to PATH
+void PathManager::BatchAddToPath(const std::vector<std::string>& directories) {
+    for (const auto& dir : directories) {
+        AddToPath(dir);
+    }
+}

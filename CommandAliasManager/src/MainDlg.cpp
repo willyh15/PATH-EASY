@@ -57,6 +57,52 @@ void CMainDlg::show() {
     nana::exec();
 }
 
+#include <windows.h>
+#include <iostream>
+#include <string>
+
+// Helper function to add a directory to the PATH
+bool AddToPath(const std::string& directory) {
+    std::string path;
+    char* buffer = nullptr;
+    size_t size = 0;
+
+    // Get the current PATH
+    if (_dupenv_s(&buffer, &size, "PATH") == 0 && buffer != nullptr) {
+        path = buffer;
+        free(buffer);
+    }
+
+    // Check if the directory is already in the PATH
+    if (path.find(directory) != std::string::npos) {
+        std::cout << "Directory is already in PATH." << std::endl;
+        return false;
+    }
+
+    // Append the new directory to the PATH
+    path += ";" + directory;
+    if (_putenv_s("PATH", path.c_str()) != 0) {
+        std::cerr << "Failed to update PATH." << std::endl;
+        return false;
+    }
+
+    std::cout << "Successfully added to PATH." << std::endl;
+    return true;
+}
+
+// Helper function to create a batch alias
+void CreateBatchAlias(const std::string& alias, const std::string& command) {
+    std::ofstream batchFile("alias.bat", std::ios::app);
+    if (batchFile.is_open()) {
+        batchFile << "doskey " << alias << "=" << command << "\n";
+        batchFile.close();
+        std::cout << "Alias created successfully." << std::endl;
+    } else {
+        std::cerr << "Unable to open batch file." << std::endl;
+    }
+}
+
+
 // Define new button event handlers
 void CMainDlg::onAddToPathClicked() {
     // Example usage of AddToPath function

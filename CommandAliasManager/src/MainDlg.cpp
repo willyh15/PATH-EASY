@@ -7,79 +7,69 @@
 #include <nana/gui/widgets/combox.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
-#include <nana/gui/widgets/treebox.hpp>  // Include treebox for directory navigation
+#include <nana/gui/widgets/treebox.hpp>
 #include <nana/gui/msgbox.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <string>
 #include <chrono>
 
-// Constructor for the main dialog
 CMainDlg::CMainDlg() {
     form_.caption("Main Dialog");
 
-    // Create buttons
+    // Load PowerShell commands for use in autocomplete
+    AliasManager::LoadPowerShellCommands("PowerShellCommands.csv");
+
+    // Create UI components
     browse_button_.create(form_);
     preferences_button_.create(form_);
     manage_commands_button_.create(form_);
     add_to_path_button_.create(form_);
     add_alias_button_.create(form_);
+    path_input_combo_.create(form_);
+    alias_input_.create(form_);
+    command_input_combo_.create(form_);
+    directory_list_.create(form_);
+    directory_tree_.create(form_);
 
-    // Set button captions
     browse_button_.caption("Browse");
     preferences_button_.caption("Preferences");
     manage_commands_button_.caption("Manage Commands");
     add_to_path_button_.caption("Add to PATH");
     add_alias_button_.caption("Add Alias");
 
-    // Create textboxes and combox for path input with autocomplete
-    path_input_combo_.create(form_);
-    alias_input_.create(form_);
-    command_input_combo_.create(form_);
-
-    // Create a listbox for directory selection
-    directory_list_.create(form_);
-
-    // Create a treebox for file explorer-like directory navigation
-    directory_tree_.create(form_);
-
-    // Populate the listbox with commonly used directories
-    directory_list_.append_header("Common Directories", 200);
-    directory_list_.append({ "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32" });
-
-    // Set placeholders for textboxes
     path_input_combo_.tip_string("Enter directory path...");
     alias_input_.tip_string("Enter alias...");
     command_input_combo_.tip_string("Enter command...");
 
-    // Define event handlers for buttons
-    browse_button_.events().click([this] {
-        onBrowseClicked();
-    });
-    preferences_button_.events().click([this] {
-        onPreferencesClicked();
-    });
-    manage_commands_button_.events().click([this] {
-        onManageCommandsClicked();
-    });
-    add_to_path_button_.events().click([this] {
-        onAddToPathClicked();
-    });
-    add_alias_button_.events().click([this] {
-        onAddAliasClicked();
+    directory_list_.append_header("Common Directories", 200);
+    directory_list_.append({ "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32" });
+
+    browse_button_.events().click([this] { onBrowseClicked(); });
+    preferences_button_.events().click([this] { onPreferencesClicked(); });
+    manage_commands_button_.events().click([this] { onManageCommandsClicked(); });
+    add_to_path_button_.events().click([this] { onAddToPathClicked(); });
+    add_alias_button_.events().click([this] { onAddAliasClicked(); });
+
+    // Add event handler for command input to provide suggestions
+    command_input_combo_.events().text_changed([this] {
+        std::string input = command_input_combo_.caption();
+        command_input_combo_.clear();
+        auto suggestions = AliasManager::SuggestCommands(input);
+        for (const auto& suggestion : suggestions) {
+            command_input_combo_.push_back(suggestion);
+        }
     });
 
-    // Event handler for path input to provide autocomplete with debounce
     path_input_combo_.events().text_changed([this] {
         static auto last_call = std::chrono::steady_clock::now();
         auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_call).count() > 300) { // 300ms debounce
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_call).count() > 300) {
             last_call = now;
             onPathInputChanged();
         }
     });
 
-    // Event handler for directory list selection
     directory_list_.events().selected([this] {
         auto selected = directory_list_.selected();
         if (!selected.empty()) {
@@ -87,7 +77,6 @@ CMainDlg::CMainDlg() {
         }
     });
 
-    // Set layout for the form
     form_.div("<vertical <browse_button><preferences_button><manage_commands_button>"
               "<weight=10% <path_input_combo><add_to_path_button>>"
               "<weight=10% <alias_input><command_input_combo><add_alias_button>>"

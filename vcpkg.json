@@ -1,16 +1,13 @@
 {
-    "name": "command-alias-manager",
+    "name": "CommandAliasManager",
     "version": "1.0.0",
     "dependencies": [
-      {
-        "name": "boost",
-        "default-features": false,
-        "features": [
-          "filesystem",
-          "system"
-        ]
-      },
-      "nana"
-    ]
-  }
-  
+        {
+            "name": "boost",
+            "default-features": false,
+            "features": ["filesystem", "regex", "program-options"]
+        },
+        "nana"
+    ],
+    "builtin-baseline": "latest"
+}

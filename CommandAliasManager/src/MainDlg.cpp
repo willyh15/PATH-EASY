@@ -31,27 +31,35 @@ CMainDlg::CMainDlg() {
     command_input_combo_.create(form_);
     directory_list_.create(form_);
     directory_tree_.create(form_);
+    alias_list_.create(form_); // Added alias_list for displaying aliases
 
+    // Set captions for buttons
     browse_button_.caption("Browse");
     preferences_button_.caption("Preferences");
     manage_commands_button_.caption("Manage Commands");
     add_to_path_button_.caption("Add to PATH");
     add_alias_button_.caption("Add Alias");
 
+    // Set placeholders for textboxes
     path_input_combo_.tip_string("Enter directory path...");
     alias_input_.tip_string("Enter alias...");
     command_input_combo_.tip_string("Enter command...");
 
+    // Populate the listbox with commonly used directories
     directory_list_.append_header("Common Directories", 200);
     directory_list_.append({ "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32" });
 
+    // Populate alias list with existing aliases
+    UpdateAliasList();
+
+    // Event handlers for buttons
     browse_button_.events().click([this] { onBrowseClicked(); });
     preferences_button_.events().click([this] { onPreferencesClicked(); });
     manage_commands_button_.events().click([this] { onManageCommandsClicked(); });
     add_to_path_button_.events().click([this] { onAddToPathClicked(); });
     add_alias_button_.events().click([this] { onAddAliasClicked(); });
 
-    // Add event handler for command input to provide suggestions
+    // Event handler for command input to provide autocomplete suggestions
     command_input_combo_.events().text_changed([this] {
         std::string input = command_input_combo_.caption();
         command_input_combo_.clear();
@@ -61,6 +69,7 @@ CMainDlg::CMainDlg() {
         }
     });
 
+    // Event handler for path input to provide suggestions
     path_input_combo_.events().text_changed([this] {
         static auto last_call = std::chrono::steady_clock::now();
         auto now = std::chrono::steady_clock::now();
@@ -70,6 +79,7 @@ CMainDlg::CMainDlg() {
         }
     });
 
+    // Event handler for directory list selection
     directory_list_.events().selected([this] {
         auto selected = directory_list_.selected();
         if (!selected.empty()) {
@@ -77,10 +87,12 @@ CMainDlg::CMainDlg() {
         }
     });
 
+    // Set layout for the form
     form_.div("<vertical <browse_button><preferences_button><manage_commands_button>"
               "<weight=10% <path_input_combo><add_to_path_button>>"
               "<weight=10% <alias_input><command_input_combo><add_alias_button>>"
-              "<weight=20% <directory_list><directory_tree>>");
+              "<weight=20% <directory_list><directory_tree>>"
+              "<weight=20% <alias_list>>");
     form_["browse_button"] << browse_button_;
     form_["preferences_button"] << preferences_button_;
     form_["manage_commands_button"] << manage_commands_button_;
@@ -91,6 +103,7 @@ CMainDlg::CMainDlg() {
     form_["add_alias_button"] << add_alias_button_;
     form_["directory_list"] << directory_list_;
     form_["directory_tree"] << directory_tree_;
+    form_["alias_list"] << alias_list_;  // Add alias list to layout
     form_.collocate();
 }
 
@@ -117,8 +130,6 @@ void CMainDlg::onAddToPathClicked() {
         nana::msgbox m(form_, "Success");
         m << "Path added successfully.";
         m.show();
-    } else {
-        // Error handling is now done in PathManager::AddToPath
     }
 }
 
@@ -150,17 +161,22 @@ void CMainDlg::onAddAliasClicked() {
     }
 
     AliasManager::CreateBatchAlias(alias, command);
-
-    // Update alias list in GUI
-    alias_list_.clear();
-    Json::Value aliases = AliasManager::LoadAliases();
-    for (const auto& alias : aliases.getMemberNames()) {
-        alias_list_.at(0).append({ alias, aliases[alias].asString() });
-    }
+    UpdateAliasList();  // Update alias list in GUI
 
     nana::msgbox m(form_, "Alias Created");
     m << "Alias created successfully.";
     m.show();
+}
+
+// Function to update the alias list in the GUI
+void CMainDlg::UpdateAliasList() {
+    alias_list_.clear();
+    Json::Value aliases = AliasManager::LoadAliases();
+    alias_list_.append_header("Alias", 100);
+    alias_list_.append_header("Command", 200);
+    for (const auto& alias : aliases.getMemberNames()) {
+        alias_list_.at(0).append({ alias, aliases[alias].asString() });
+    }
 }
 
 // Event handler for path input text change with limited depth search and debounce
@@ -170,7 +186,7 @@ void CMainDlg::onPathInputChanged() {
 
     if (input.length() < 2) return;
 
-    boost::filesystem::path search_path(path_input_combo_.caption());
+    boost::filesystem::path search_path(input);
     bool found_any = false;
     int max_depth = 2;
 
@@ -217,5 +233,3 @@ void CMainDlg::onPreferencesClicked() {
 void CMainDlg::onManageCommandsClicked() {
     command_alias_dlg_.show();
 }
-
-// Additional methods related to UI functionalities (e.g., directory scanning, settings) should remain here

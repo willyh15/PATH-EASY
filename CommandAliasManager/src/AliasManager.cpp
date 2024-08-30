@@ -3,10 +3,24 @@
 #include <fstream>
 #include <nana/gui/msgbox.hpp>
 #include <regex>
+#include <sstream>
+#include <filesystem>
 
-// Define the path for the aliases JSON file
-const std::string alias_file_path = "aliases.json";
+// Determine the user-specific data directory path based on the operating system
+#ifdef _WIN32
+const std::string user_data_dir = std::string(getenv("APPDATA")) + "\\YourAppName\\";
+#else
+const std::string user_data_dir = std::string(getenv("HOME")) + "/.YourAppName/";
+#endif
 
+// Define the paths for the aliases JSON file and PowerShell commands CSV file
+const std::string alias_file_path = user_data_dir + "aliases.json";
+const std::string ps_commands_file_path = user_data_dir + "PowerShellCommands.csv";
+
+// Ensure the user data directory exists
+std::filesystem::create_directories(user_data_dir);
+
+// Initialize the PowerShell command dictionary
 std::unordered_map<std::string, std::string> AliasManager::ps_command_dict_;
 
 // Load PowerShell commands from a CSV file into a dictionary
@@ -14,7 +28,7 @@ void AliasManager::LoadPowerShellCommands(const std::string& filepath) {
     std::ifstream file(filepath);
     if (!file.is_open()) {
         nana::msgbox m("Error");
-        m << "Failed to load PowerShell commands from file.";
+        m << "Failed to load PowerShell commands from file: " << filepath;
         m.show();
         return;
     }
@@ -27,6 +41,7 @@ void AliasManager::LoadPowerShellCommands(const std::string& filepath) {
             ps_command_dict_[name] = definition;
         }
     }
+    file.close();
 }
 
 // Get suggestions for a command based on input
@@ -106,3 +121,4 @@ void AliasManager::BulkAliasCreation(const std::vector<std::pair<std::string, st
         CreateBatchAlias(alias, command);
     }
 }
+

@@ -1,12 +1,25 @@
 {
+    "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/x64-windows/Debug/CommandAliasManager.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "preLaunchTask": "build"
+        },
+        {
+            "name": "CMake Debug",
             "type": "cmake",
             "request": "launch",
-            "name": "Debug portfile(s)",
-            "cmakeDebugType": "external",
-            "pipeName": "\\\\.\\pipe\\vcpkg_ext_portfile_dbg",
-            "preLaunchTask": "Debug vcpkg commands"
+            "cmakeDebugType": "script",
+            "scriptPath": "${workspaceFolder}/CMakeLists.txt",
+            "args": []
         }
     ]
 }

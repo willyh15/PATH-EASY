@@ -28,5 +28,19 @@
                 "CMAKE_TOOLCHAIN_FILE": "C:/Users/willh/vcpkg/scripts/buildsystems/vcpkg.cmake"
             }
         }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-x64",
+            "hidden": false,
+            "configurePreset": "x64-windows",
+            "configuration": "Debug"
+        },
+        {
+            "name": "build-x86",
+            "hidden": false,
+            "configurePreset": "x86-windows",
+            "configuration": "Debug"
+        }
     ]
 }

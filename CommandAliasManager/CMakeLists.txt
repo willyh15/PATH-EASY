@@ -27,7 +27,7 @@ find_package(jsoncpp CONFIG REQUIRED)
 
 # Source files
 set(SOURCES
-    src/MainApp.cpp
+    main.cpp
     src/AliasManager.cpp
     src/MainDlg.cpp
     src/PathManager.cpp

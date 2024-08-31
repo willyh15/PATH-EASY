@@ -1,20 +1,31 @@
 cmake_minimum_required(VERSION 3.15)
 
-# Set the project name
-project(MyApp)
+# Project Name
+project(CommandAliasManager)
 
-# Specify the C++ standard
+# Specify C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add vcpkg integration
+# Vcpkg integration
 if(DEFINED ENV{VCPKG_ROOT})
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-else()
-    message(FATAL_ERROR "Please set the VCPKG_ROOT environment variable to the path of your vcpkg installation.")
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-# Add the source files
+# Find Qt6 packages
+set(QT_VERSION 6)
+find_package(Qt${QT_VERSION} COMPONENTS Core Gui Widgets REQUIRED)
+
+# Include directories for headers
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Find Boost libraries
+find_package(Boost REQUIRED COMPONENTS filesystem)
+
+# Find JSON for Modern C++
+find_package(jsoncpp CONFIG REQUIRED)
+
+# Source files
 set(SOURCES
     src/MainApp.cpp
     src/AliasManager.cpp
@@ -22,25 +33,17 @@ set(SOURCES
     src/PathManager.cpp
 )
 
-# Add the include directories
-include_directories(include)
-
 # Add executable
-add_executable(MyApp ${SOURCES})
+add_executable(CommandAliasManager ${SOURCES})
 
-# Find and link the Nana library
-find_package(nana CONFIG REQUIRED)
-target_link_libraries(MyApp PRIVATE nana)
+# Link Qt libraries
+target_link_libraries(CommandAliasManager PRIVATE Qt${QT_VERSION}::Core Qt${QT_VERSION}::Gui Qt${QT_VERSION}::Widgets)
 
-# Find and link the Boost library
-find_package(Boost REQUIRED COMPONENTS filesystem)
-target_link_libraries(MyApp PRIVATE Boost::filesystem)
+# Link Boost libraries
+target_link_libraries(CommandAliasManager PRIVATE Boost::filesystem)
 
-# Find and link the JSON library (jsoncpp)
-find_package(jsoncpp CONFIG REQUIRED)
-target_link_libraries(MyApp PRIVATE jsoncpp_lib)
+# Link JSON library
+target_link_libraries(CommandAliasManager PRIVATE jsoncpp_lib)
 
-# Include the directories where the headers are located
-target_include_directories(MyApp PRIVATE ${Boost_INCLUDE_DIRS})
-target_include_directories(MyApp PRIVATE ${NANA_INCLUDE_DIRS})
-target_include_directories(MyApp PRIVATE ${JSONCPP_INCLUDE_DIRS})
+# Include directories for libraries
+target_include_directories(CommandAliasManager PRIVATE ${Boost_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})

@@ -1,6 +1,6 @@
 #include "PathManager.h"
 #include <windows.h>
-#include <nana/gui/msgbox.hpp>
+#include <QMessageBox>
 #include <boost/filesystem.hpp>
 
 bool PathManager::AddToPath(const std::string& directory) {
@@ -12,30 +12,22 @@ bool PathManager::AddToPath(const std::string& directory) {
         path = buffer;
         free(buffer);
     } else {
-        nana::msgbox m("Error");
-        m << "Failed to retrieve the current PATH.";
-        m.show();
+        QMessageBox::critical(nullptr, "Error", "Failed to retrieve the current PATH.");
         return false;
     }
 
     if (path.find(directory) != std::string::npos) {
-        nana::msgbox m("Information");
-        m << "Directory is already in PATH.";
-        m.show();
+        QMessageBox::information(nullptr, "Information", "Directory is already in PATH.");
         return false;
     }
 
     path += ";" + directory;
     if (_putenv_s("PATH", path.c_str()) != 0) {
-        nana::msgbox m("Error");
-        m << "Failed to update PATH.";
-        m.show();
+        QMessageBox::critical(nullptr, "Error", "Failed to update PATH.");
         return false;
     }
 
-    nana::msgbox m("Success");
-    m << "Successfully added to PATH.";
-    m.show();
+    QMessageBox::information(nullptr, "Success", "Successfully added to PATH.");
     return true;
 }
 

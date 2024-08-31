@@ -1,5 +1,4 @@
 #include "AliasManager.h"
-#include <nana/gui/msgbox.hpp>
 #include <regex>
 #include <sstream>
 #include <filesystem>
@@ -18,9 +17,7 @@ std::unordered_map<std::string, std::string> AliasManager::ps_command_dict_;
 void AliasManager::LoadPowerShellCommands(const std::string& filepath) {
     std::ifstream file(filepath);
     if (!file.is_open()) {
-        nana::msgbox m("Error");
-        m << "Failed to load PowerShell commands from file: " << filepath;
-        m.show();
+        QMessageBox::critical(nullptr, "Error", "Failed to load PowerShell commands from file: " + QString::fromStdString(filepath));
         return;
     }
 
@@ -52,14 +49,10 @@ Json::Value AliasManager::LoadAliases() {
         try {
             file >> aliases;
         } catch (const std::exception& e) {
-            nana::msgbox m("Error");
-            m << "Failed to load aliases: " << e.what();
-            m.show();
+            QMessageBox::critical(nullptr, "Error", "Failed to load aliases: " + QString::fromStdString(e.what()));
         }
     } else {
-        nana::msgbox m("Error");
-        m << "Unable to open alias file for reading.";
-        m.show();
+        QMessageBox::critical(nullptr, "Error", "Unable to open alias file for reading.");
     }
     return aliases;
 }
@@ -70,14 +63,10 @@ void AliasManager::SaveAliases(const Json::Value& aliases) {
         try {
             file << aliases;
         } catch (const std::exception& e) {
-            nana::msgbox m("Error");
-            m << "Failed to save aliases: " << e.what();
-            m.show();
+            QMessageBox::critical(nullptr, "Error", "Failed to save aliases: " + QString::fromStdString(e.what()));
         }
     } else {
-        nana::msgbox m("Error");
-        m << "Unable to open alias file for writing.";
-        m.show();
+        QMessageBox::critical(nullptr, "Error", "Unable to open alias file for writing.");
     }
 }
 

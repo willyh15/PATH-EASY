@@ -1,207 +1,94 @@
 #include "MainDlg.h"
+#include "ManageCommandsDialog.h"
 #include "AliasManager.h"
 #include "PathManager.h"
-#include <boost/filesystem.hpp>
-#include <chrono>
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QListWidget>
+
+const QString COMMANDS_FILE_PATH = "commands.txt";
 
 CMainDlg::CMainDlg() {
-    form_.caption("Main Dialog");
+    // Set up UI
+    aliasList = new QListWidget(this);
+    QPushButton *manageCommandsButton = new QPushButton("Manage Commands", this);
 
-    AliasManager::LoadPowerShellCommands("PowerShellCommands.csv");
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->addWidget(aliasList);
+    layout->addWidget(manageCommandsButton);
+    setLayout(layout);
 
-    browse_button_.create(form_);
-    preferences_button_.create(form_);
-    manage_commands_button_.create(form_);
-    add_to_path_button_.create(form_);
-    add_alias_button_.create(form_);
-    path_input_combo_.create(form_);
-    alias_input_.create(form_);
-    command_input_combo_.create(form_);
-    directory_list_.create(form_);
-    directory_tree_.create(form_);
-    alias_list_.create(form_);
+    // Connect signals to slots
+    connect(manageCommandsButton, &QPushButton::clicked, this, &CMainDlg::onManageCommandsClicked);
 
-    browse_button_.caption("Browse");
-    preferences_button_.caption("Preferences");
-    manage_commands_button_.caption("Manage Commands");
-    add_to_path_button_.caption("Add to PATH");
-    add_alias_button_.caption("Add Alias");
-
-    path_input_combo_.tip_string("Enter directory path...");
-    alias_input_.tip_string("Enter alias...");
-    command_input_combo_.tip_string("Enter command...");
-
-    directory_list_.append_header("Common Directories", 200);
-    directory_list_.append({ "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32" });
-
+    // Load existing commands on startup
+    existingCommands = loadCommandsFromFile();
     UpdateAliasList();
+}
 
-    browse_button_.events().click([this] { onBrowseClicked(); });
-    preferences_button_.events().click([this] { onPreferencesClicked(); });
-    manage_commands_button_.events().click([this] { onManageCommandsClicked(); });
-    add_to_path_button_.events().click([this] { onAddToPathClicked(); });
-    add_alias_button_.events().click([this] { onAddAliasClicked(); });
+CMainDlg::~CMainDlg() {
+    saveCommandsToFile(existingCommands);
+}
 
-    command_input_combo_.events().text_changed([this] {
-        std::string input = command_input_combo_.caption();
-        command_input_combo_.clear();
-        auto suggestions = AliasManager::SuggestCommands(input);
-        for (const auto& suggestion : suggestions) {
-            command_input_combo_.push_back(suggestion);
+void CMainDlg::saveCommandsToFile(const QMap<QString, QString>& commands) {
+    QFile file(COMMANDS_FILE_PATH);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        for (auto it = commands.begin(); it != commands.end(); ++it) {
+            out << it.key() << ":" << it.value() << "\n";
         }
-    });
-
-    path_input_combo_.events().text_changed([this] {
-        static auto last_call = std::chrono::steady_clock::now();
-        auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_call).count() > 300) {
-            last_call = now;
-            onPathInputChanged();
-        }
-    });
-
-    directory_list_.events().selected([this] {
-        auto selected = directory_list_.selected();
-        if (!selected.empty()) {
-            path_input_combo_.caption(directory_list_.at(0).at(selected.front().item).text());
-        }
-    });
-
-    form_.div("<vertical <browse_button><preferences_button><manage_commands_button>"
-              "<weight=10% <path_input_combo><add_to_path_button>>"
-              "<weight=10% <alias_input><command_input_combo><add_alias_button>>"
-              "<weight=20% <directory_list><directory_tree>>"
-              "<weight=20% <alias_list>>");
-    form_["browse_button"] << browse_button_;
-    form_["preferences_button"] << preferences_button_;
-    form_["manage_commands_button"] << manage_commands_button_;
-    form_["path_input_combo"] << path_input_combo_;
-    form_["add_to_path_button"] << add_to_path_button_;
-    form_["alias_input"] << alias_input_;
-    form_["command_input_combo"] << command_input_combo_;
-    form_["add_alias_button"] << add_alias_button_;
-    form_["directory_list"] << directory_list_;
-    form_["directory_tree"] << directory_tree_;
-    form_["alias_list"] << alias_list_;
-    form_.collocate();
-}
-
-CMainDlg::~CMainDlg() {}
-
-void CMainDlg::show() {
-    form_.show();
-    nana::exec();
-}
-
-void CMainDlg::onAddToPathClicked() {
-    std::string directory = path_input_combo_.caption();
-    if (directory.empty()) {
-        nana::msgbox m(form_, "Error");
-        m << "Please enter a valid directory.";
-        m.show();
-        return;
-    }
-
-    if (PathManager::AddToPath(directory)) {
-        nana::msgbox m(form_, "Success");
-        m << "Path added successfully.";
-        m.show();
+        file.close();
+    } else {
+        QMessageBox::warning(this, "Error", "Unable to save commands to file.");
     }
 }
 
-void CMainDlg::onAddAliasClicked() {
-    std::string alias = alias_input_.caption();
-    std::string command = command_input_combo_.caption();
-    if (alias.empty() || command.empty()) {
-        nana::msgbox m(form_, "Error");
-        m << "Please enter both alias and command.";
-        m.show();
-        return;
-    }
-
-    if (alias.find(' ') != std::string::npos || alias.find('=') != std::string::npos) {
-        nana::msgbox m(form_, "Error");
-        m << "Alias name cannot contain spaces or '='.";
-        m.show();
-        return;
-    }
-
-    if (AliasManager::AliasExists(alias)) {
-        nana::msgbox m(form_, "Alias Exists");
-        m << "An alias with this name already exists. Do you want to overwrite it?";
-        m << nana::msgbox::yes_no;
-        if (m.show() == nana::msgbox::pick_no) {
-            return;
-        }
-    }
-
-    AliasManager::CreateBatchAlias(alias, command);
-    UpdateAliasList();
-
-    nana::msgbox m(form_, "Alias Created");
-    m << "Alias created successfully.";
-    m.show();
-}
-
-void CMainDlg::UpdateAliasList() {
-    alias_list_.clear();
-    Json::Value aliases = AliasManager::LoadAliases();
-    alias_list_.append_header("Alias", 100);
-    alias_list_.append_header("Command", 200);
-    for (const auto& alias : aliases.getMemberNames()) {
-        alias_list_.at(0).append({ alias, aliases[alias].asString() });
-    }
-}
-
-void CMainDlg::onPathInputChanged() {
-    std::string input = path_input_combo_.caption();
-    path_input_combo_.clear();
-
-    if (input.length() < 2) return;
-
-    boost::filesystem::path search_path(input);
-    bool found_any = false;
-    int max_depth = 2;
-
-    try {
-        for (boost::filesystem::recursive_directory_iterator it(search_path), end; it != end; ++it) {
-            if (boost::filesystem::is_directory(it->path())) {
-                if (it.level() > max_depth) {
-                    it.pop();
-                    continue;
-                }
-            }
-
-            if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) {
-                std::string entry_name = it->path().filename().string();
-                if (entry_name.find(input) != std::string::npos) {
-                    path_input_combo_.push_back(entry_name);
-                    found_any = true;
-                }
+QMap<QString, QString> CMainDlg::loadCommandsFromFile() {
+    QMap<QString, QString> commands;
+    QFile file(COMMANDS_FILE_PATH);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            QStringList parts = line.split(":");
+            if (parts.size() == 2) {
+                commands.insert(parts[0], parts[1]);
             }
         }
-    } catch (const boost::filesystem::filesystem_error& ex) {
-        nana::msgbox m(form_, "Error");
-        m << "Error reading directory: " << ex.what();
-        m.show();
-        return;
+        file.close();
+    } else {
+        QMessageBox::warning(this, "Error", "Unable to load commands from file.");
     }
-
-    if (!found_any) {
-        nana::msgbox m(form_, "No Matches");
-        m << "No matching executable files found.";
-        m.show();
-    }
-}
-
-void CMainDlg::onBrowseClicked() {
-    // Implement the logic for the browse button click event
-}
-
-void CMainDlg::onPreferencesClicked() {
-    // Implement the logic for the preferences button click event
+    return commands;
 }
 
 void CMainDlg::onManageCommandsClicked() {
-    // Implement the logic for the manage commands button click event
+    ManageCommandsDialog dialog(this);
+
+    // Pre-fill the dialog with existing commands
+    for (auto it = existingCommands.begin(); it != existingCommands.end(); ++it) {
+        dialog.commandsList->addItem(new QListWidgetItem(it.key()));
+        dialog.commandMap.insert(it.key(), it.value());
+    }
+
+    if (dialog.exec() == QDialog::Accepted) {
+        QMap<QString, QString> updatedCommands = dialog.getCommands();
+        existingCommands = updatedCommands;
+        UpdateAliasList();
+        saveCommandsToFile(existingCommands);
+        QMessageBox::information(this, "Commands Updated", "The commands have been updated successfully.");
+    }
+}
+
+void CMainDlg::UpdateAliasList() {
+    aliasList->clear();
+    for (auto it = existingCommands.begin(); it != existingCommands.end(); ++it) {
+        QListWidgetItem *item = new QListWidgetItem(it.key());
+        item->setData(Qt::UserRole, it.value());
+        aliasList->addItem(item);
+    }
 }

@@ -1,9 +1,9 @@
-#include <nana/gui.hpp>
+#include <QApplication>
 #include "MainDlg.h"
 
-int main() {
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
     CMainDlg mainDialog;
     mainDialog.show();
-    nana::exec(); // Start the Nana event loop
-    return 0;
+    return app.exec();
 }

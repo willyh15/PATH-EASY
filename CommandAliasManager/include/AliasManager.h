@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <json/json.h> // Make sure the JSON library is properly linked
+#include <json/json.h> // Ensure the JSON library is properly linked
 #include <fstream>
 
 // AliasManager class definition

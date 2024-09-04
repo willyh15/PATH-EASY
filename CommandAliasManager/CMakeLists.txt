@@ -13,7 +13,7 @@ if(DEFINED ENV{VCPKG_ROOT})
 endif()
 
 # Find Qt6 packages
-set(QT_VERSION 6)  # Ensure using Qt6
+set(QT_VERSION 6)
 find_package(Qt${QT_VERSION} COMPONENTS Core Gui Widgets REQUIRED)
 
 # Include directories for headers
@@ -30,8 +30,8 @@ set(SOURCES
     main.cpp
     src/AliasManager.cpp
     src/MainDlg.cpp
-    src/ManageCommandsDialog.cpp
     src/PathManager.cpp
+    src/ManageCommandsDialog.cpp
 )
 
 # Add executable

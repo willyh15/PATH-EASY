@@ -25,8 +25,8 @@ jobs:
       run: |
         git clone https://github.com/microsoft/vcpkg.git
         .\vcpkg\bootstrap-vcpkg.bat
-        .\vcpkg\vcpkg install qt5-base boost-filesystem jsoncpp
-        
+        .\vcpkg\vcpkg install qt6-base boost-filesystem jsoncpp
+
     - name: Configure CMake
       run: cmake -S CommandAliasManager -B build -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
 

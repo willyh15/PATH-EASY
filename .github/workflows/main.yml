@@ -29,7 +29,7 @@ jobs:
         .\bootstrap-vcpkg.bat
         .\vcpkg.exe update
         .\vcpkg.exe search qt
-        # If qt6-base is not found, try installing qt5-base
+        # Install qt5-base instead of qt6-base
         .\vcpkg.exe install qt5-base boost-filesystem jsoncpp
 
     - name: Configure CMake

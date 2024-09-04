@@ -12,8 +12,8 @@ if(DEFINED ENV{VCPKG_ROOT})
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-# Find Qt6 packages
-set(QT_VERSION 6)
+# Find Qt5 packages
+set(QT_VERSION 5)  # Change from 6 to 5
 find_package(Qt${QT_VERSION} COMPONENTS Core Gui Widgets REQUIRED)
 
 # Include directories for headers

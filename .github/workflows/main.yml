@@ -15,6 +15,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     - name: Set up MSVC
       uses: ilammy/msvc-dev-cmd@v1
@@ -24,9 +26,9 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git
         .\vcpkg\bootstrap-vcpkg.bat
         .\vcpkg\vcpkg install qt5-base boost-filesystem jsoncpp
-
+        
     - name: Configure CMake
-      run: cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
+      run: cmake -S CommandAliasManager -B build -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build build --config Release

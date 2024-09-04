@@ -29,7 +29,8 @@ jobs:
         .\bootstrap-vcpkg.bat
         .\vcpkg.exe update
         .\vcpkg.exe search qt
-        .\vcpkg.exe install qt6-base boost-filesystem jsoncpp
+        # If qt6-base is not found, try installing qt5-base
+        .\vcpkg.exe install qt5-base boost-filesystem jsoncpp
 
     - name: Configure CMake
       run: cmake -S CommandAliasManager -B build -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=Release

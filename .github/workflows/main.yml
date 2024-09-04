@@ -27,9 +27,9 @@ jobs:
         cd vcpkg
         Remove-Item Env:\VCPKG_ROOT
         .\bootstrap-vcpkg.bat
-        .\vcpkg\vcpkg update
-        .\vcpkg\vcpkg search qt
-        .\vcpkg\vcpkg install qt6-base boost-filesystem jsoncpp
+        .\vcpkg.exe update
+        .\vcpkg.exe search qt
+        .\vcpkg.exe install qt6-base boost-filesystem jsoncpp
 
     - name: Configure CMake
       run: cmake -S CommandAliasManager -B build -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=Release

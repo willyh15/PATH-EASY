@@ -69,10 +69,10 @@ QMap<QString, QString> CMainDlg::loadCommandsFromFile() {
 void CMainDlg::onManageCommandsClicked() {
     ManageCommandsDialog dialog(this);
 
-    // Pre-fill the dialog with existing commands
+    // Use getters to access private members
     for (auto it = existingCommands.begin(); it != existingCommands.end(); ++it) {
-        dialog.commandsList->addItem(new QListWidgetItem(it.key()));
-        dialog.commandMap.insert(it.key(), it.value());
+        dialog.getCommandsList()->addItem(new QListWidgetItem(it.key()));
+        dialog.getCommandMap().insert(it.key(), it.value());
     }
 
     if (dialog.exec() == QDialog::Accepted) {

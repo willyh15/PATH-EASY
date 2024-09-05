@@ -24,6 +24,11 @@ private:
     QPushButton *editButton;
     QPushButton *removeButton;
     QMap<QString, QString> commandMap;
+
+    // Add getters for private members
+public:
+    QListWidget* getCommandsList() const { return commandsList; }
+    QMap<QString, QString>& getCommandMap() { return commandMap; }
 };
 
 #endif // MANAGECOMMANDSDIALOG_H

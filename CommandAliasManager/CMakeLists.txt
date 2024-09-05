@@ -34,8 +34,17 @@ set(SOURCES
     src/ManageCommandsDialog.cpp
 )
 
+# Headers with Q_OBJECT macro
+set(HEADERS
+    include/MainDlg.h
+    include/ManageCommandsDialog.h
+)
+
+# Run moc on headers with Q_OBJECT macro
+qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
+
 # Add executable
-add_executable(CommandAliasManager ${SOURCES})
+add_executable(CommandAliasManager ${SOURCES} ${MOC_SOURCES})
 
 # Link Qt libraries
 target_link_libraries(CommandAliasManager PRIVATE Qt${QT_VERSION}::Core Qt${QT_VERSION}::Gui Qt${QT_VERSION}::Widgets)

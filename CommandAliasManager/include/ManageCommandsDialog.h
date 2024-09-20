@@ -3,32 +3,32 @@
 
 #include <QDialog>
 #include <QListWidget>
-#include <QPushButton>
 #include <QMap>
+#include <QPushButton>
 
 class ManageCommandsDialog : public QDialog {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit ManageCommandsDialog(QWidget *parent = nullptr);
-    QMap<QString, QString> getCommands() const;
+  explicit ManageCommandsDialog(QWidget *parent = nullptr);
+  QMap<QString, QString> getCommands() const;
 
 private slots:
-    void addCommand();
-    void editCommand();
-    void removeCommand();
+  void addCommand();
+  void editCommand();
+  void removeCommand();
 
 private:
-    QListWidget *commandsList;
-    QPushButton *addButton;
-    QPushButton *editButton;
-    QPushButton *removeButton;
-    QMap<QString, QString> commandMap;
+  QListWidget *commandsList;
+  QPushButton *addButton;
+  QPushButton *editButton;
+  QPushButton *removeButton;
+  QMap<QString, QString> commandMap;
 
-    // Add getters for private members
+  // Add getters for private members
 public:
-    QListWidget* getCommandsList() const { return commandsList; }
-    QMap<QString, QString>& getCommandMap() { return commandMap; }
+  QListWidget *getCommandsList() const { return commandsList; }
+  QMap<QString, QString> &getCommandMap() { return commandMap; }
 };
 
 #endif // MANAGECOMMANDSDIALOG_H

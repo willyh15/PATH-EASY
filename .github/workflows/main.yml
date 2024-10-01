@@ -19,15 +19,19 @@ jobs:
     - name: Set up CMake
       uses: jwlawson/actions-setup-cmake@v1.10
 
-    - name: Install Dependencies
+    - name: Install vcpkg
       run: |
-        choco install -y qt5 boost-msvc-14.1
-        choco install -y jsoncpp
+        git clone https://github.com/microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
 
-    - name: Configure CMake
-      run: cmake -G "Visual Studio 16 2019" .
+    - name: Install Dependencies using vcpkg
+      run: |
+        .\vcpkg\vcpkg.exe install qt5 jsoncpp boost
 
-    - name: Build
+    - name: Configure CMake with vcpkg Toolchain
+      run: cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake .
+
+    - name: Build the Project
       run: cmake --build . --config Release
 
     - name: Archive Build Artifacts

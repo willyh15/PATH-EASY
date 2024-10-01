@@ -1,8 +1,8 @@
 #ifndef PATHMANAGER_H
 #define PATHMANAGER_H
 
-#include <string>
 #include <set>
+#include <string>
 #include <vector>
 
 class PathManager {

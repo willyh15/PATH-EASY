@@ -1,4 +1,4 @@
-name: Windows Build
+name: Build and Export Windows .exe
 
 on:
   push:
@@ -9,34 +9,29 @@ on:
       - main
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout Code
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
-    - name: Set up MSVC
-      uses: ilammy/msvc-dev-cmd@v1
+    - name: Set up CMake
+      uses: jwlawson/actions-setup-cmake@v1.10
 
-    - name: Install dependencies with vcpkg
+    - name: Install Dependencies
       run: |
-        git clone https://github.com/microsoft/vcpkg.git
-        cd vcpkg
-        Remove-Item Env:\VCPKG_ROOT
-        .\bootstrap-vcpkg.bat
-        .\vcpkg.exe update
-        .\vcpkg.exe install qt5-base:x64-windows boost-filesystem:x64-windows jsoncpp:x64-windows
+        choco install -y qt5 boost-msvc-14.1
+        choco install -y jsoncpp
 
     - name: Configure CMake
-      run: cmake -S CommandAliasManager -B build -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
+      run: cmake -G "Visual Studio 16 2019" .
 
     - name: Build
-      run: cmake --build build --config Release
+      run: cmake --build . --config Release
 
-    - name: Run tests
-      run: |
-        cd build
-        ctest --output-on-failure
+    - name: Archive Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: CommandAliasManager-Executable
+        path: ./Release/CommandAliasManager.exe

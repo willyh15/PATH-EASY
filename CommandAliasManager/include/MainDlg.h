@@ -2,14 +2,14 @@
 #define MAINDLG_H
 
 #include <QDialog>
-#include <QMap>
 #include <QListWidget>
+#include <QMap>
 
 class CMainDlg : public QDialog {
   Q_OBJECT
 
 public:
-  CMainDlg(); // Constructor
+  CMainDlg();  // Constructor
   ~CMainDlg(); // Destructor
 
 private slots:

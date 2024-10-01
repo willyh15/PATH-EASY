@@ -18,9 +18,9 @@ public:
   QMap<QString, QString> &getCommandMap() { return commandMap; }
 
 private slots:
-  void addCommand();      // Slot for adding a command
-  void editCommand();     // Slot for editing a command
-  void removeCommand();   // Slot for removing a command
+  void addCommand();    // Slot for adding a command
+  void editCommand();   // Slot for editing a command
+  void removeCommand(); // Slot for removing a command
 
 private:
   // Member variables

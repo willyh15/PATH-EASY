@@ -1,18 +1,21 @@
 #include "AliasManager.h"
+#include <QMessageBox>
+#include <algorithm> // For std::transform
 #include <filesystem>
 #include <regex>
 #include <sstream>
-#include <algorithm> // For std::transform
-#include <QMessageBox>
 
 #ifdef _WIN32
-const std::string user_data_dir = std::string(getenv("APPDATA")) + "\\CommandAliasManager\\";
+const std::string user_data_dir =
+    std::string(getenv("APPDATA")) + "\\CommandAliasManager\\";
 #else
-const std::string user_data_dir = std::string(getenv("HOME")) + "/.CommandAliasManager/";
+const std::string user_data_dir =
+    std::string(getenv("HOME")) + "/.CommandAliasManager/";
 #endif
 
 const std::string alias_file_path = user_data_dir + "aliases.json";
-const std::string ps_commands_file_path = user_data_dir + "PowerShellCommands.csv";
+const std::string ps_commands_file_path =
+    user_data_dir + "PowerShellCommands.csv";
 
 std::unordered_map<std::string, std::string> AliasManager::ps_command_dict_;
 
@@ -20,7 +23,9 @@ std::unordered_map<std::string, std::string> AliasManager::ps_command_dict_;
 void AliasManager::LoadPowerShellCommands(const std::string &filepath) {
   std::ifstream file(filepath);
   if (!file.is_open()) {
-    QMessageBox::critical(nullptr, "Error", "Failed to load PowerShell commands from file: " + QString::fromStdString(filepath));
+    QMessageBox::critical(nullptr, "Error",
+                          "Failed to load PowerShell commands from file: " +
+                              QString::fromStdString(filepath));
     return;
   }
 
@@ -36,17 +41,20 @@ void AliasManager::LoadPowerShellCommands(const std::string &filepath) {
 }
 
 // Improved suggestion mechanism using fuzzy matching and filtering
-std::vector<std::string> AliasManager::SuggestCommands(const std::string &input) {
+std::vector<std::string>
+AliasManager::SuggestCommands(const std::string &input) {
   std::vector<std::string> suggestions;
 
   // Convert input to lowercase for case-insensitive matching
   std::string loweredInput = input;
-  std::transform(loweredInput.begin(), loweredInput.end(), loweredInput.begin(), ::tolower);
+  std::transform(loweredInput.begin(), loweredInput.end(), loweredInput.begin(),
+                 ::tolower);
 
   for (const auto &cmd : ps_command_dict_) {
     std::string loweredCmd = cmd.first;
-    std::transform(loweredCmd.begin(), loweredCmd.end(), loweredCmd.begin(), ::tolower);
-    
+    std::transform(loweredCmd.begin(), loweredCmd.end(), loweredCmd.begin(),
+                   ::tolower);
+
     // Use simple fuzzy matching (contains the input substring)
     if (loweredCmd.find(loweredInput) != std::string::npos) {
       suggestions.push_back(cmd.first);
@@ -54,9 +62,11 @@ std::vector<std::string> AliasManager::SuggestCommands(const std::string &input)
   }
 
   // Sort suggestions based on length and relevance
-  std::sort(suggestions.begin(), suggestions.end(), [](const std::string &a, const std::string &b) {
-    return a.length() < b.length(); // Shorter commands have higher priority
-  });
+  std::sort(suggestions.begin(), suggestions.end(),
+            [](const std::string &a, const std::string &b) {
+              return a.length() <
+                     b.length(); // Shorter commands have higher priority
+            });
 
   return suggestions;
 }
@@ -69,10 +79,13 @@ Json::Value AliasManager::LoadAliases() {
     try {
       file >> aliases;
     } catch (const std::exception &e) {
-      QMessageBox::critical(nullptr, "Error", "Failed to load aliases: " + QString::fromStdString(e.what()));
+      QMessageBox::critical(nullptr, "Error",
+                            "Failed to load aliases: " +
+                                QString::fromStdString(e.what()));
     }
   } else {
-    QMessageBox::critical(nullptr, "Error", "Unable to open alias file for reading.");
+    QMessageBox::critical(nullptr, "Error",
+                          "Unable to open alias file for reading.");
   }
   return aliases;
 }
@@ -84,10 +97,13 @@ void AliasManager::SaveAliases(const Json::Value &aliases) {
     try {
       file << aliases;
     } catch (const std::exception &e) {
-      QMessageBox::critical(nullptr, "Error", "Failed to save aliases: " + QString::fromStdString(e.what()));
+      QMessageBox::critical(nullptr, "Error",
+                            "Failed to save aliases: " +
+                                QString::fromStdString(e.what()));
     }
   } else {
-    QMessageBox::critical(nullptr, "Error", "Unable to open alias file for writing.");
+    QMessageBox::critical(nullptr, "Error",
+                          "Unable to open alias file for writing.");
   }
 }
 
@@ -98,7 +114,8 @@ bool AliasManager::AliasExists(const std::string &alias) {
 }
 
 // Create a batch alias and save to the JSON file
-void AliasManager::CreateBatchAlias(const std::string &alias, const std::string &command) {
+void AliasManager::CreateBatchAlias(const std::string &alias,
+                                    const std::string &command) {
   Json::Value aliases = LoadAliases();
   aliases[alias] = command;
   SaveAliases(aliases);
@@ -114,7 +131,8 @@ std::string AliasManager::translateAlias(const std::string &aliasDefinition) {
 }
 
 // Create multiple aliases at once and save them to the JSON file
-void AliasManager::BulkAliasCreation(const std::vector<std::pair<std::string, std::string>> &aliases) {
+void AliasManager::BulkAliasCreation(
+    const std::vector<std::pair<std::string, std::string>> &aliases) {
   Json::Value aliasJson = LoadAliases();
   for (const auto &[alias, command] : aliases) {
     aliasJson[alias] = command;

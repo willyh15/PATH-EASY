@@ -1,11 +1,11 @@
 #ifndef ALIASMANAGER_H
 #define ALIASMANAGER_H
 
+#include <fstream>
+#include <json/json.h> // Assuming you're using JsonCpp for handling JSON files
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <fstream>
-#include <json/json.h> // Assuming you're using JsonCpp for handling JSON files
 
 class AliasManager {
 public:
@@ -14,8 +14,10 @@ public:
   static void SaveAliases(const Json::Value &aliases);
   static Json::Value LoadAliases();
   static bool AliasExists(const std::string &alias);
-  static void CreateBatchAlias(const std::string &alias, const std::string &command);
-  static void BulkAliasCreation(const std::vector<std::pair<std::string, std::string>> &aliases);
+  static void CreateBatchAlias(const std::string &alias,
+                               const std::string &command);
+  static void BulkAliasCreation(
+      const std::vector<std::pair<std::string, std::string>> &aliases);
   static std::string translateAlias(const std::string &aliasDefinition);
 
 private:

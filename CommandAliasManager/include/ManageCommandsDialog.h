@@ -11,24 +11,24 @@ class ManageCommandsDialog : public QDialog {
 
 public:
   explicit ManageCommandsDialog(QWidget *parent = nullptr);
-  QMap<QString, QString> getCommands() const;
+  QMap<QString, QString> getCommands() const; // Returns the current command map
+
+  // Getter for accessing the commands list UI element from outside
+  QListWidget *getCommandsList() { return commandsList; }
+  QMap<QString, QString> &getCommandMap() { return commandMap; }
 
 private slots:
-  void addCommand();
-  void editCommand();
-  void removeCommand();
+  void addCommand();      // Slot for adding a command
+  void editCommand();     // Slot for editing a command
+  void removeCommand();   // Slot for removing a command
 
 private:
+  // Member variables
   QListWidget *commandsList;
   QPushButton *addButton;
   QPushButton *editButton;
   QPushButton *removeButton;
-  QMap<QString, QString> commandMap;
-
-  // Add getters for private members
-public:
-  QListWidget *getCommandsList() const { return commandsList; }
-  QMap<QString, QString> &getCommandMap() { return commandMap; }
+  QMap<QString, QString> commandMap; // Stores the command name-definition pairs
 };
 
 #endif // MANAGECOMMANDSDIALOG_H

@@ -1,9 +1,9 @@
 #include "ManageCommandsDialog.h"
 #include <QInputDialog>
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QSortFilterProxyModel>
 #include <QLineEdit>
+#include <QMessageBox>
+#include <QSortFilterProxyModel>
+#include <QVBoxLayout>
 
 // Constructor: Sets up the command management dialog with UI components
 ManageCommandsDialog::ManageCommandsDialog(QWidget *parent) : QDialog(parent) {
@@ -22,12 +22,16 @@ ManageCommandsDialog::ManageCommandsDialog(QWidget *parent) : QDialog(parent) {
   setLayout(layout);
 
   // Set up connections for buttons
-  connect(addButton, &QPushButton::clicked, this, &ManageCommandsDialog::addCommand);
-  connect(editButton, &QPushButton::clicked, this, &ManageCommandsDialog::editCommand);
-  connect(removeButton, &QPushButton::clicked, this, &ManageCommandsDialog::removeCommand);
+  connect(addButton, &QPushButton::clicked, this,
+          &ManageCommandsDialog::addCommand);
+  connect(editButton, &QPushButton::clicked, this,
+          &ManageCommandsDialog::editCommand);
+  connect(removeButton, &QPushButton::clicked, this,
+          &ManageCommandsDialog::removeCommand);
 
   // Setup filtering functionality
-  connect(filterBox, &QLineEdit::textChanged, this, &ManageCommandsDialog::filterCommands);
+  connect(filterBox, &QLineEdit::textChanged, this,
+          &ManageCommandsDialog::filterCommands);
 
   // Real-time validation and suggestions
   filterBox->setPlaceholderText("Search or filter commands...");
@@ -41,8 +45,9 @@ QMap<QString, QString> ManageCommandsDialog::getCommands() const {
 // Add a new command with validation and suggestions
 void ManageCommandsDialog::addCommand() {
   bool ok;
-  QString commandName = QInputDialog::getText(this, "Add Command", "Command Name:", QLineEdit::Normal, "", &ok);
-  
+  QString commandName = QInputDialog::getText(
+      this, "Add Command", "Command Name:", QLineEdit::Normal, "", &ok);
+
   // Validate the command name
   if (!ok || commandName.isEmpty()) {
     showError("Command name cannot be empty.");
@@ -54,8 +59,9 @@ void ManageCommandsDialog::addCommand() {
     return;
   }
 
-  QString commandDefinition = QInputDialog::getText(this, "Add Command", "Command Definition:", QLineEdit::Normal, "", &ok);
-  
+  QString commandDefinition = QInputDialog::getText(
+      this, "Add Command", "Command Definition:", QLineEdit::Normal, "", &ok);
+
   // Validate the command definition
   if (!ok || commandDefinition.isEmpty()) {
     showError("Command definition cannot be empty.");
@@ -80,8 +86,10 @@ void ManageCommandsDialog::editCommand() {
   QString currentDefinition = currentItem->data(Qt::UserRole).toString();
 
   bool ok;
-  QString newDefinition = QInputDialog::getText(this, "Edit Command", "Command Definition:", QLineEdit::Normal, currentDefinition, &ok);
-  
+  QString newDefinition = QInputDialog::getText(
+      this, "Edit Command", "Command Definition:", QLineEdit::Normal,
+      currentDefinition, &ok);
+
   // Validate the new definition
   if (!ok || newDefinition.isEmpty()) {
     showError("Command definition cannot be empty.");

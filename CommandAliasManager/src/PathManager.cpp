@@ -1,9 +1,9 @@
 #include "PathManager.h"
 #include <QMessageBox>
-#include <boost/filesystem.hpp>
-#include <windows.h>
 #include <algorithm>
+#include <boost/filesystem.hpp>
 #include <iostream>
+#include <windows.h>
 
 bool PathManager::AddToPath(const std::string &directory) {
   if (!validatePath(directory)) {
@@ -29,13 +29,16 @@ bool PathManager::AddToPath(const std::string &directory) {
 
 // Scans common directories and suggests executable paths for addition
 std::set<std::string> PathManager::scanAndSuggestPaths() {
-  std::vector<std::string> common_dirs = {"C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32"};
+  std::vector<std::string> common_dirs = {
+      "C:\\Program Files", "C:\\Program Files (x86)", "C:\\Windows\\System32"};
   std::set<std::string> suggestions;
 
   for (const auto &dir : common_dirs) {
     if (boost::filesystem::exists(dir)) {
-      for (boost::filesystem::recursive_directory_iterator it(dir), end; it != end; ++it) {
-        if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) {
+      for (boost::filesystem::recursive_directory_iterator it(dir), end;
+           it != end; ++it) {
+        if (boost::filesystem::is_regular_file(it->path()) &&
+            (it->path().extension() == ".exe")) {
           suggestions.insert(it->path().string());
         }
       }
@@ -90,8 +93,10 @@ bool PathManager::updateSystemPath(const std::string &newPath) {
   // Windows-specific: Update the registry for permanent PATH changes
 #ifdef _WIN32
   HKEY hKey;
-  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Environment", 0, KEY_SET_VALUE, &hKey) == ERROR_SUCCESS) {
-    RegSetValueEx(hKey, "PATH", 0, REG_SZ, (const BYTE *)newPath.c_str(), (DWORD)(newPath.size() + 1));
+  if (RegOpenKeyEx(HKEY_CURRENT_USER, "Environment", 0, KEY_SET_VALUE, &hKey) ==
+      ERROR_SUCCESS) {
+    RegSetValueEx(hKey, "PATH", 0, REG_SZ, (const BYTE *)newPath.c_str(),
+                  (DWORD)(newPath.size() + 1));
     RegCloseKey(hKey);
   }
 #endif
@@ -100,7 +105,8 @@ bool PathManager::updateSystemPath(const std::string &newPath) {
 
 // Show an information message box
 void PathManager::showMessage(const std::string &message) {
-  QMessageBox::information(nullptr, "Information", QString::fromStdString(message));
+  QMessageBox::information(nullptr, "Information",
+                           QString::fromStdString(message));
 }
 
 // Show an error message box

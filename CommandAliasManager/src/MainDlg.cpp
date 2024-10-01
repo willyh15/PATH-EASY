@@ -12,9 +12,10 @@
 
 const QString COMMANDS_FILE_PATH = "commands.txt";
 
-// Constructor: Initializes the main dialog with UI elements and loads existing commands
+// Constructor: Initializes the main dialog with UI elements and loads existing
+// commands
 CMainDlg::CMainDlg() {
-  setupUI(); // Setup UI components
+  setupUI();          // Setup UI components
   setupConnections(); // Setup signal-slot connections
 
   // Load existing commands and update the UI
@@ -23,9 +24,7 @@ CMainDlg::CMainDlg() {
 }
 
 // Destructor: Saves the commands to file on exit
-CMainDlg::~CMainDlg() { 
-  saveCommandsToFile(existingCommands); 
-}
+CMainDlg::~CMainDlg() { saveCommandsToFile(existingCommands); }
 
 // Sets up the UI elements and layout
 void CMainDlg::setupUI() {
@@ -40,7 +39,8 @@ void CMainDlg::setupUI() {
 
 // Sets up the connections between buttons and corresponding slots
 void CMainDlg::setupConnections() {
-  connect(manageCommandsButton, &QPushButton::clicked, this, &CMainDlg::onManageCommandsClicked);
+  connect(manageCommandsButton, &QPushButton::clicked, this,
+          &CMainDlg::onManageCommandsClicked);
 }
 
 // Save commands to file
@@ -81,7 +81,8 @@ QMap<QString, QString> CMainDlg::loadCommandsFromFile() {
 void CMainDlg::onManageCommandsClicked() {
   ManageCommandsDialog dialog(this);
 
-  populateDialogWithExistingCommands(dialog); // Populate the dialog with current commands
+  populateDialogWithExistingCommands(
+      dialog); // Populate the dialog with current commands
 
   if (dialog.exec() == QDialog::Accepted) {
     QMap<QString, QString> updatedCommands = dialog.getCommands();
@@ -103,7 +104,8 @@ void CMainDlg::UpdateAliasList() {
 }
 
 // Populates the ManageCommandsDialog with the existing commands
-void CMainDlg::populateDialogWithExistingCommands(ManageCommandsDialog &dialog) {
+void CMainDlg::populateDialogWithExistingCommands(
+    ManageCommandsDialog &dialog) {
   for (auto it = existingCommands.begin(); it != existingCommands.end(); ++it) {
     dialog.getCommandsList()->addItem(new QListWidgetItem(it.key()));
     dialog.getCommandMap().insert(it.key(), it.value());

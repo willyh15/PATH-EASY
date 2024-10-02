@@ -3,12 +3,13 @@
 
 #include <QDialog>
 #include <QListWidget>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include <QMap>
+#include <QPushButton>
 #include <QString>
+#include <QVBoxLayout>
 
-// ManageCommandsDialog Class: Manages the addition, editing, and removal of commands
+// ManageCommandsDialog Class: Manages the addition, editing, and removal of
+// commands
 class ManageCommandsDialog : public QDialog {
   Q_OBJECT
 
@@ -41,10 +42,10 @@ private:
   void setupConnections();
 
   // UI Elements
-  QListWidget *commandsList;     // List widget for displaying commands
-  QPushButton *addButton;        // Button to add a new command
-  QPushButton *editButton;       // Button to edit the selected command
-  QPushButton *removeButton;     // Button to remove the selected command
+  QListWidget *commandsList; // List widget for displaying commands
+  QPushButton *addButton;    // Button to add a new command
+  QPushButton *editButton;   // Button to edit the selected command
+  QPushButton *removeButton; // Button to remove the selected command
 
   // Command Map: Holds command name and its corresponding definition
   QMap<QString, QString> commandMap;

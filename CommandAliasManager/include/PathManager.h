@@ -25,7 +25,8 @@ public:
 
 private:
   // Helper function to check if a directory already exists in PATH
-  static bool DirectoryExistsInPath(const std::string &directory, const std::string &pathVariable);
+  static bool DirectoryExistsInPath(const std::string &directory,
+                                    const std::string &pathVariable);
 };
 
 #endif // PATHMANAGER_H

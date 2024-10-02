@@ -49,10 +49,14 @@ void NestedVariantDialog::setupUI() {
 
 // Set up signal-slot connections
 void NestedVariantDialog::setupConnections() {
-  connect(addVariantButton, &QPushButton::clicked, this, &NestedVariantDialog::addNestedVariant);
-  connect(saveVariantButton, &QPushButton::clicked, this, &NestedVariantDialog::saveVariant);
-  connect(deleteVariantButton, &QPushButton::clicked, this, &NestedVariantDialog::deleteVariant);
-  connect(variantTree, &QTreeWidget::itemClicked, this, &NestedVariantDialog::onVariantSelected);
+  connect(addVariantButton, &QPushButton::clicked, this,
+          &NestedVariantDialog::addNestedVariant);
+  connect(saveVariantButton, &QPushButton::clicked, this,
+          &NestedVariantDialog::saveVariant);
+  connect(deleteVariantButton, &QPushButton::clicked, this,
+          &NestedVariantDialog::deleteVariant);
+  connect(variantTree, &QTreeWidget::itemClicked, this,
+          &NestedVariantDialog::onVariantSelected);
 }
 
 // Set the list of variants for the selected template
@@ -68,15 +72,18 @@ QList<CommandVariant> NestedVariantDialog::getVariants() const {
 
 // Add a new nested variant to the selected variant
 void NestedVariantDialog::addNestedVariant() {
-  QString newVariantName = QInputDialog::getText(this, "New Nested Variant", "Variant Name:");
-  if (newVariantName.isEmpty()) return;
+  QString newVariantName =
+      QInputDialog::getText(this, "New Nested Variant", "Variant Name:");
+  if (newVariantName.isEmpty())
+    return;
 
   CommandVariant newVariant;
   newVariant.variantName = newVariantName;
   newVariant.condition = "";
   newVariant.commandStructure = "";
 
-  if (selectedVariantIndex >= 0 && selectedVariantIndex < commandVariants.size()) {
+  if (selectedVariantIndex >= 0 &&
+      selectedVariantIndex < commandVariants.size()) {
     commandVariants[selectedVariantIndex].nestedVariants.append(newVariant);
   } else {
     commandVariants.append(newVariant);
@@ -86,17 +93,20 @@ void NestedVariantDialog::addNestedVariant() {
 
 // Save changes to the currently selected variant
 void NestedVariantDialog::saveVariant() {
-  if (selectedVariantIndex >= 0 && selectedVariantIndex < commandVariants.size()) {
+  if (selectedVariantIndex >= 0 &&
+      selectedVariantIndex < commandVariants.size()) {
     commandVariants[selectedVariantIndex].variantName = variantName->text();
     commandVariants[selectedVariantIndex].condition = variantCondition->text();
-    commandVariants[selectedVariantIndex].commandStructure = variantCommandStructure->toPlainText();
+    commandVariants[selectedVariantIndex].commandStructure =
+        variantCommandStructure->toPlainText();
     updateVariantTree();
   }
 }
 
 // Delete the selected nested variant
 void NestedVariantDialog::deleteVariant() {
-  if (selectedVariantIndex >= 0 && selectedVariantIndex < commandVariants.size()) {
+  if (selectedVariantIndex >= 0 &&
+      selectedVariantIndex < commandVariants.size()) {
     commandVariants.removeAt(selectedVariantIndex);
     updateVariantTree();
     clearVariantDetails();
@@ -105,11 +115,13 @@ void NestedVariantDialog::deleteVariant() {
 
 // Handle variant selection and display details
 void NestedVariantDialog::onVariantSelected(QTreeWidgetItem *item) {
-  if (!item) return;
+  if (!item)
+    return;
 
   selectedVariantIndex = item->data(0, Qt::UserRole).toInt();
 
-  if (selectedVariantIndex >= 0 && selectedVariantIndex < commandVariants.size()) {
+  if (selectedVariantIndex >= 0 &&
+      selectedVariantIndex < commandVariants.size()) {
     CommandVariant selectedVariant = commandVariants[selectedVariantIndex];
     variantName->setText(selectedVariant.variantName);
     variantCondition->setText(selectedVariant.condition);
@@ -129,7 +141,8 @@ void NestedVariantDialog::updateVariantTree() {
 }
 
 // Add nested variants to the tree
-void NestedVariantDialog::addNestedItems(QTreeWidgetItem *parentItem, const QList<CommandVariant> &nestedVariants) {
+void NestedVariantDialog::addNestedItems(
+    QTreeWidgetItem *parentItem, const QList<CommandVariant> &nestedVariants) {
   for (int i = 0; i < nestedVariants.size(); ++i) {
     QTreeWidgetItem *nestedItem = new QTreeWidgetItem(parentItem);
     nestedItem->setText(0, nestedVariants[i].variantName);

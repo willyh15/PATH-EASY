@@ -21,12 +21,14 @@ void ConditionalArgumentDialog::setupUI() {
   layout->addWidget(argumentNameInput);
 
   // Condition Input
-  layout->addWidget(new QLabel("Condition (e.g., {placeholder} == value):", this));
+  layout->addWidget(
+      new QLabel("Condition (e.g., {placeholder} == value):", this));
   argumentConditionInput = new QLineEdit(this);
   layout->addWidget(argumentConditionInput);
 
   // Argument Value Input
-  layout->addWidget(new QLabel("Argument Value (applied if condition is met):", this));
+  layout->addWidget(
+      new QLabel("Argument Value (applied if condition is met):", this));
   argumentValueInput = new QTextEdit(this);
   layout->addWidget(argumentValueInput);
 
@@ -39,7 +41,8 @@ void ConditionalArgumentDialog::setupUI() {
 
 // Set up signal-slot connections
 void ConditionalArgumentDialog::setupConnections() {
-  connect(saveButton, &QPushButton::clicked, this, &ConditionalArgumentDialog::saveConditionalArgument);
+  connect(saveButton, &QPushButton::clicked, this,
+          &ConditionalArgumentDialog::saveConditionalArgument);
 }
 
 // Set the condition for the dialog
@@ -53,7 +56,8 @@ QString ConditionalArgumentDialog::getCondition() const {
 }
 
 // Set the argument details
-void ConditionalArgumentDialog::setArgumentDetails(const ConditionalArgument &argument) {
+void ConditionalArgumentDialog::setArgumentDetails(
+    const ConditionalArgument &argument) {
   currentArgument = argument;
 
   // Set UI elements with argument details
@@ -72,8 +76,10 @@ ConditionalArgument ConditionalArgumentDialog::getArgumentDetails() const {
 }
 
 // Validate the entered condition
-bool ConditionalArgumentDialog::validateCondition(const QString &condition) const {
-  // Simple validation: Check if the condition has the format {placeholder} == value
+bool ConditionalArgumentDialog::validateCondition(
+    const QString &condition) const {
+  // Simple validation: Check if the condition has the format {placeholder} ==
+  // value
   QRegExp conditionRegex(R"(\{(\w+)\}\s*==\s*(\w+))");
   if (!conditionRegex.exactMatch(condition)) {
     return false;
@@ -89,8 +95,9 @@ bool ConditionalArgumentDialog::validateCondition(const QString &condition) cons
 void ConditionalArgumentDialog::saveConditionalArgument() {
   QString condition = getCondition();
   if (!validateCondition(condition)) {
-    QMessageBox::warning(this, "Invalid Condition",
-                         "The condition must follow the format: {placeholder} == value");
+    QMessageBox::warning(
+        this, "Invalid Condition",
+        "The condition must follow the format: {placeholder} == value");
     return;
   }
 
@@ -98,12 +105,13 @@ void ConditionalArgumentDialog::saveConditionalArgument() {
   currentArgument.argumentName = argumentNameInput->text().trimmed();
   currentArgument.condition = condition;
   currentArgument.argumentValue = argumentValueInput->toPlainText().trimmed();
-  
-  if (currentArgument.argumentName.isEmpty() || currentArgument.argumentValue.isEmpty()) {
+
+  if (currentArgument.argumentName.isEmpty() ||
+      currentArgument.argumentValue.isEmpty()) {
     QMessageBox::warning(this, "Incomplete Argument",
                          "Both the argument name and value must be specified.");
     return;
   }
 
-  accept();  // Close the dialog and indicate success
+  accept(); // Close the dialog and indicate success
 }

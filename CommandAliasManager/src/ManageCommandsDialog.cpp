@@ -35,9 +35,12 @@ void ManageCommandsDialog::setupUI() {
 
 // Set up signal-slot connections
 void ManageCommandsDialog::setupConnections() {
-  connect(addButton, &QPushButton::clicked, this, &ManageCommandsDialog::addCommand);
-  connect(editButton, &QPushButton::clicked, this, &ManageCommandsDialog::editCommand);
-  connect(removeButton, &QPushButton::clicked, this, &ManageCommandsDialog::removeCommand);
+  connect(addButton, &QPushButton::clicked, this,
+          &ManageCommandsDialog::addCommand);
+  connect(editButton, &QPushButton::clicked, this,
+          &ManageCommandsDialog::editCommand);
+  connect(removeButton, &QPushButton::clicked, this,
+          &ManageCommandsDialog::removeCommand);
 }
 
 // Retrieve the current command map
@@ -46,9 +49,7 @@ QMap<QString, QString> ManageCommandsDialog::getCommands() const {
 }
 
 // Accessor to get the commands list widget for external population
-QListWidget *ManageCommandsDialog::getCommandsList() {
-  return commandsList;
-}
+QListWidget *ManageCommandsDialog::getCommandsList() { return commandsList; }
 
 // Accessor to get the command map for modification
 QMap<QString, QString> &ManageCommandsDialog::getCommandMap() {
@@ -58,20 +59,25 @@ QMap<QString, QString> &ManageCommandsDialog::getCommandMap() {
 // Slot to add a new command
 void ManageCommandsDialog::addCommand() {
   bool ok;
-  QString commandName = QInputDialog::getText(this, "Add Command", "Command Name:", QLineEdit::Normal, "", &ok);
+  QString commandName = QInputDialog::getText(
+      this, "Add Command", "Command Name:", QLineEdit::Normal, "", &ok);
   if (!ok || commandName.isEmpty()) {
-    QMessageBox::warning(this, "Invalid Input", "Command name cannot be empty.");
+    QMessageBox::warning(this, "Invalid Input",
+                         "Command name cannot be empty.");
     return;
   }
 
   if (commandMap.contains(commandName)) {
-    QMessageBox::warning(this, "Duplicate Command", "A command with this name already exists.");
+    QMessageBox::warning(this, "Duplicate Command",
+                         "A command with this name already exists.");
     return;
   }
 
-  QString commandDefinition = QInputDialog::getText(this, "Add Command", "Command Definition:", QLineEdit::Normal, "", &ok);
+  QString commandDefinition = QInputDialog::getText(
+      this, "Add Command", "Command Definition:", QLineEdit::Normal, "", &ok);
   if (!ok || commandDefinition.isEmpty()) {
-    QMessageBox::warning(this, "Invalid Input", "Command definition cannot be empty.");
+    QMessageBox::warning(this, "Invalid Input",
+                         "Command definition cannot be empty.");
     return;
   }
 
@@ -85,7 +91,8 @@ void ManageCommandsDialog::addCommand() {
 void ManageCommandsDialog::editCommand() {
   QListWidgetItem *currentItem = commandsList->currentItem();
   if (!currentItem) {
-    QMessageBox::warning(this, "No Selection", "Please select a command to edit.");
+    QMessageBox::warning(this, "No Selection",
+                         "Please select a command to edit.");
     return;
   }
 
@@ -93,9 +100,12 @@ void ManageCommandsDialog::editCommand() {
   QString currentDefinition = currentItem->data(Qt::UserRole).toString();
 
   bool ok;
-  QString newDefinition = QInputDialog::getText(this, "Edit Command", "Command Definition:", QLineEdit::Normal, currentDefinition, &ok);
+  QString newDefinition = QInputDialog::getText(
+      this, "Edit Command", "Command Definition:", QLineEdit::Normal,
+      currentDefinition, &ok);
   if (!ok || newDefinition.isEmpty()) {
-    QMessageBox::warning(this, "Invalid Input", "Command definition cannot be empty.");
+    QMessageBox::warning(this, "Invalid Input",
+                         "Command definition cannot be empty.");
     return;
   }
 
@@ -108,7 +118,8 @@ void ManageCommandsDialog::editCommand() {
 void ManageCommandsDialog::removeCommand() {
   QListWidgetItem *currentItem = commandsList->currentItem();
   if (!currentItem) {
-    QMessageBox::warning(this, "No Selection", "Please select a command to remove.");
+    QMessageBox::warning(this, "No Selection",
+                         "Please select a command to remove.");
     return;
   }
 

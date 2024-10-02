@@ -54,10 +54,14 @@ void VariantDialog::setupUI() {
 
 // Set up signal-slot connections
 void VariantDialog::setupConnections() {
-  connect(variantList, &QListWidget::itemClicked, this, &VariantDialog::onVariantSelected);
-  connect(addVariantButton, &QPushButton::clicked, this, &VariantDialog::addVariant);
-  connect(saveVariantButton, &QPushButton::clicked, this, &VariantDialog::saveVariant);
-  connect(deleteVariantButton, &QPushButton::clicked, this, &VariantDialog::deleteVariant);
+  connect(variantList, &QListWidget::itemClicked, this,
+          &VariantDialog::onVariantSelected);
+  connect(addVariantButton, &QPushButton::clicked, this,
+          &VariantDialog::addVariant);
+  connect(saveVariantButton, &QPushButton::clicked, this,
+          &VariantDialog::saveVariant);
+  connect(deleteVariantButton, &QPushButton::clicked, this,
+          &VariantDialog::deleteVariant);
 }
 
 // Set the list of variants for the selected template
@@ -73,8 +77,10 @@ QList<CommandVariant> VariantDialog::getVariants() const {
 
 // Add a new variant to the list
 void VariantDialog::addVariant() {
-  QString newVariantName = QInputDialog::getText(this, "New Variant", "Variant Name:");
-  if (newVariantName.isEmpty()) return;
+  QString newVariantName =
+      QInputDialog::getText(this, "New Variant", "Variant Name:");
+  if (newVariantName.isEmpty())
+    return;
 
   CommandVariant newVariant;
   newVariant.variantName = newVariantName;
@@ -86,17 +92,20 @@ void VariantDialog::addVariant() {
 
 // Save changes to the currently selected variant
 void VariantDialog::saveVariant() {
-  if (selectedVariantIndex >= 0 && selectedVariantIndex < commandVariants.size()) {
+  if (selectedVariantIndex >= 0 &&
+      selectedVariantIndex < commandVariants.size()) {
     commandVariants[selectedVariantIndex].variantName = variantName->text();
     commandVariants[selectedVariantIndex].condition = variantCondition->text();
-    commandVariants[selectedVariantIndex].commandStructure = variantCommandStructure->toPlainText();
+    commandVariants[selectedVariantIndex].commandStructure =
+        variantCommandStructure->toPlainText();
     updateVariantList();
   }
 }
 
 // Delete the selected variant from the list
 void VariantDialog::deleteVariant() {
-  if (selectedVariantIndex >= 0 && selectedVariantIndex < commandVariants.size()) {
+  if (selectedVariantIndex >= 0 &&
+      selectedVariantIndex < commandVariants.size()) {
     commandVariants.removeAt(selectedVariantIndex);
     updateVariantList();
     clearVariantDetails();
@@ -105,11 +114,13 @@ void VariantDialog::deleteVariant() {
 
 // Handle variant selection and display details
 void VariantDialog::onVariantSelected(QListWidgetItem *item) {
-  if (!item) return;
+  if (!item)
+    return;
 
   selectedVariantIndex = item->data(Qt::UserRole).toInt();
 
-  if (selectedVariantIndex >= 0 && selectedVariantIndex < commandVariants.size()) {
+  if (selectedVariantIndex >= 0 &&
+      selectedVariantIndex < commandVariants.size()) {
     CommandVariant selectedVariant = commandVariants[selectedVariantIndex];
     variantName->setText(selectedVariant.variantName);
     variantCondition->setText(selectedVariant.condition);
@@ -121,7 +132,8 @@ void VariantDialog::onVariantSelected(QListWidgetItem *item) {
 void VariantDialog::updateVariantList() {
   variantList->clear();
   for (int i = 0; i < commandVariants.size(); ++i) {
-    QListWidgetItem *item = new QListWidgetItem(commandVariants[i].variantName, variantList);
+    QListWidgetItem *item =
+        new QListWidgetItem(commandVariants[i].variantName, variantList);
     item->setData(Qt::UserRole, i);
   }
 }

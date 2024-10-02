@@ -1,14 +1,15 @@
 #include "PathManager.h"
 #include <QMessageBox>
 #include <boost/filesystem.hpp>
-#include <windows.h>
 #include <cstdlib>
+#include <windows.h>
 
 // Add a directory to the system PATH variable
 bool PathManager::AddToPath(const std::string &directory) {
   std::string currentPath = GetCurrentPath();
   if (DirectoryExistsInPath(directory, currentPath)) {
-    QMessageBox::information(nullptr, "Information", "Directory is already in PATH.");
+    QMessageBox::information(nullptr, "Information",
+                             "Directory is already in PATH.");
     return false;
   }
 
@@ -24,8 +25,10 @@ std::set<std::string> PathManager::ScanAndSuggestPaths() {
 
   for (const auto &dir : common_dirs) {
     if (boost::filesystem::exists(dir)) {
-      for (boost::filesystem::recursive_directory_iterator it(dir), end; it != end; ++it) {
-        if (boost::filesystem::is_regular_file(it->path()) && (it->path().extension() == ".exe")) {
+      for (boost::filesystem::recursive_directory_iterator it(dir), end;
+           it != end; ++it) {
+        if (boost::filesystem::is_regular_file(it->path()) &&
+            (it->path().extension() == ".exe")) {
           suggestions.insert(it->path().string());
         }
       }
@@ -52,7 +55,8 @@ std::string PathManager::GetCurrentPath() {
     path = buffer;
     free(buffer);
   } else {
-    QMessageBox::critical(nullptr, "Error", "Failed to retrieve the current PATH.");
+    QMessageBox::critical(nullptr, "Error",
+                          "Failed to retrieve the current PATH.");
   }
   return path;
 }
@@ -69,15 +73,17 @@ bool PathManager::UpdatePath(const std::string &newPath) {
 }
 
 // Check if a directory already exists in the PATH variable
-bool PathManager::DirectoryExistsInPath(const std::string &directory, const std::string &pathVariable) {
+bool PathManager::DirectoryExistsInPath(const std::string &directory,
+                                        const std::string &pathVariable) {
   size_t pos = pathVariable.find(directory);
   if (pos == std::string::npos) {
     return false;
   }
 
   // Ensure it's not a substring of another path
-  if ((pos > 0 && pathVariable[pos - 1] != ';') || 
-      (pos + directory.length() < pathVariable.length() && pathVariable[pos + directory.length()] != ';')) {
+  if ((pos > 0 && pathVariable[pos - 1] != ';') ||
+      (pos + directory.length() < pathVariable.length() &&
+       pathVariable[pos + directory.length()] != ';')) {
     return false;
   }
   return true;

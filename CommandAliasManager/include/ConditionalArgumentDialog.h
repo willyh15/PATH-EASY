@@ -2,19 +2,19 @@
 #define CONDITIONALARGUMENTDIALOG_H
 
 #include <QDialog>
-#include <QLineEdit>
-#include <QTextEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QMap>
-#include <QString>
 #include <QLabel>
+#include <QLineEdit>
+#include <QMap>
+#include <QPushButton>
+#include <QString>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 // Structure to represent a conditional argument
 struct ConditionalArgument {
-  QString argumentName;   // Name of the argument
-  QString condition;      // Condition for including this argument
-  QString argumentValue;  // Value of the argument when the condition is met
+  QString argumentName;  // Name of the argument
+  QString condition;     // Condition for including this argument
+  QString argumentValue; // Value of the argument when the condition is met
 };
 
 // Conditional Argument Dialog Class
@@ -49,9 +49,9 @@ private:
   void setupConnections();
 
   // UI Elements
-  QLineEdit *argumentNameInput;         // Input field for argument name
-  QLineEdit *argumentConditionInput;    // Input field for condition
-  QTextEdit *argumentValueInput;        // Text area for argument value
+  QLineEdit *argumentNameInput;      // Input field for argument name
+  QLineEdit *argumentConditionInput; // Input field for condition
+  QTextEdit *argumentValueInput;     // Text area for argument value
 
   // Buttons for managing the dialog
   QPushButton *saveButton;

@@ -2,27 +2,85 @@
 #define MAINDLG_H
 
 #include <QDialog>
+#include <QLabel>
 #include <QMap>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QTreeWidget>
+#include <QVBoxLayout>
 #include <QListWidget>
+#include <QTreeWidgetItem>
+#include <QInputDialog>
+#include "TemplateManagerDialog.h"
+#include "AliasManager.h"
+#include "PathManager.h"
+
+// Forward declaration for managing template variants
+struct CommandVariant;
 
 class CMainDlg : public QDialog {
   Q_OBJECT
 
 public:
-  CMainDlg(); // Constructor
-  ~CMainDlg(); // Destructor
+  CMainDlg(QWidget *parent = nullptr);
+  ~CMainDlg();
+
+  // Insert a variant into the command builder with dynamic placeholder replacement
+  void insertVariantIntoCommandBuilder(const CommandVariant &variant, const QMap<QString, QString> &placeholderValues);
+  
+  // Update live command preview with selected variants
+  void updateLiveCommandPreviewWithVariants(const QList<CommandVariant> &variants, const QMap<QString, QString> &placeholderValues);
+
+  // Evaluate a variant condition against placeholder values
+  bool evaluateCondition(const QString &condition, const QMap<QString, QString> &placeholderValues);
+
+  // Function to dynamically replace placeholders in a variant
+  QString replaceComplexPlaceholdersInVariant(const CommandVariant &variant, const QMap<QString, QString> &placeholderValues);
+
+  // Function to handle nested placeholder replacement
+  QString evaluateMultiLevelPlaceholders(const QString &commandStructure, const QMap<QString, QString> &placeholderValues);
+
+  // Function to validate complex command templates
+  bool validateComplexCommandTemplate(const QString &templateStructure, const QMap<QString, QString> &placeholderValues, const QStringList &conditionalArguments);
+
+signals:
+  // Signal to show a warning for unresolved placeholders
+  void showWarning(const QString &message);
 
 private slots:
-  void onManageCommandsClicked(); // Slot for managing commands
-  void UpdateAliasList();         // Updates the alias list UI
+  // Slot to manage template insertion
+  void onInsertVariantClicked();
+
+  // Slot to handle template management
+  void openTemplateManager();
+
+  // Slot to update live command preview dynamically
+  void updateLiveCommandPreview();
+
+  // Slot to update contextual help for complex structures
+  void updateContextualHelpForComplexStructures(const QString &commandStructure);
 
 private:
-  void saveCommandsToFile(const QMap<QString, QString> &commands);
-  QMap<QString, QString> loadCommandsFromFile();
+  // UI Components
+  QLabel *contextualHelp;
+  QTreeWidget *commandBuilderTree;
+  QLabel *liveCommandPreview;
+  QListWidget *commandLibrary;
+  QTreeWidget *commandHistoryTree;
 
-  // Member variables
-  QListWidget *aliasList; // UI element for displaying command aliases
-  QMap<QString, QString> existingCommands;
+  // Template Management
+  QPushButton *manageTemplatesButton;
+  QPushButton *insertTemplateButton;
+
+  // Placeholder Management
+  QMap<QString, QString> resolvedPlaceholders;
+
+  // Command Templates
+  QList<CommandTemplate> commandTemplates;
+
+  // Helper functions
+  void setupUI();
+  void setupConnections();
 };
 
 #endif // MAINDLG_H

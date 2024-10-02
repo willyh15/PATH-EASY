@@ -1,23 +1,23 @@
 #ifndef NESTEDVARIANTDIALOG_H
 #define NESTEDVARIANTDIALOG_H
 
+#include "CommandTemplate.h"
 #include <QDialog>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QMap>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QTreeWidget>
 #include <QVBoxLayout>
-#include <QMap>
-#include "CommandTemplate.h"
 
 // Data structure for storing a nested command variant
 struct CommandVariant {
-  QString variantName;       // Variant name
-  QString condition;         // Condition for using this variant
-  QString commandStructure;  // Command structure for this variant
-  QStringList placeholders;  // Placeholders specific to this variant
-  QList<CommandVariant> nestedVariants;  // Nested variants within this variant
+  QString variantName;                  // Variant name
+  QString condition;                    // Condition for using this variant
+  QString commandStructure;             // Command structure for this variant
+  QStringList placeholders;             // Placeholders specific to this variant
+  QList<CommandVariant> nestedVariants; // Nested variants within this variant
 };
 
 // Nested Variant Management Dialog Class
@@ -55,20 +55,21 @@ private:
   void updateVariantTree();
 
   // Helper function to add nested items to the tree
-  void addNestedItems(QTreeWidgetItem *parentItem, const QList<CommandVariant> &nestedVariants);
+  void addNestedItems(QTreeWidgetItem *parentItem,
+                      const QList<CommandVariant> &nestedVariants);
 
   // Helper function to clear the variant details
   void clearVariantDetails();
 
   // Variant List and Current Selection
-  QList<CommandVariant> commandVariants;  // List of command variants
-  int selectedVariantIndex;               // Index of the currently selected variant
+  QList<CommandVariant> commandVariants; // List of command variants
+  int selectedVariantIndex; // Index of the currently selected variant
 
   // UI Elements
-  QTreeWidget *variantTree;               // Tree widget for displaying nested variants
-  QLineEdit *variantName;                 // Input field for variant name
-  QLineEdit *variantCondition;            // Input field for variant condition
-  QTextEdit *variantCommandStructure;     // Text area for the command structure
+  QTreeWidget *variantTree;    // Tree widget for displaying nested variants
+  QLineEdit *variantName;      // Input field for variant name
+  QLineEdit *variantCondition; // Input field for variant condition
+  QTextEdit *variantCommandStructure; // Text area for the command structure
 
   // Buttons for managing variants
   QPushButton *addVariantButton;

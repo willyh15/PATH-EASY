@@ -2,13 +2,13 @@
 #define ALIASMANAGER_H
 
 #include <QMap>
-#include <QString>
 #include <QMessageBox>
-#include <unordered_map>
-#include <vector>
-#include <string>
+#include <QString>
 #include <fstream>
 #include <json/json.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 // AliasManager Class: Handles alias creation, management, and translation
 class AliasManager {
@@ -29,7 +29,8 @@ public:
   static std::string TranslateAlias(const std::string &aliasDefinition);
 
   // Bulk alias creation for batch operations
-  static void BulkAliasCreation(const std::vector<std::pair<std::string, std::string>> &aliases);
+  static void BulkAliasCreation(
+      const std::vector<std::pair<std::string, std::string>> &aliases);
 
   // Load PowerShell commands into the alias manager for suggestions
   static void LoadPowerShellCommands(const std::string &filepath);

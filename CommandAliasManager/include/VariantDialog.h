@@ -1,24 +1,24 @@
 #ifndef VARIANTDIALOG_H
 #define VARIANTDIALOG_H
 
-#include <QDialog>
-#include <QListWidget>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QLineEdit>
-#include <QTextEdit>
-#include <QHBoxLayout>
-#include <QMap>
-#include <QLabel>
 #include "CommandTemplate.h"
+#include <QDialog>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QMap>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 // Data structure for storing a command variant
 struct CommandVariant {
-  QString variantName;       // Variant name
-  QString condition;         // Condition for using this variant
-  QString commandStructure;  // Command structure for this variant
-  QStringList placeholders;  // Placeholders specific to this variant
-  QList<CommandVariant> nestedVariants;  // Nested variants within this variant
+  QString variantName;                  // Variant name
+  QString condition;                    // Condition for using this variant
+  QString commandStructure;             // Command structure for this variant
+  QStringList placeholders;             // Placeholders specific to this variant
+  QList<CommandVariant> nestedVariants; // Nested variants within this variant
 };
 
 // Variant Management Dialog Class
@@ -59,13 +59,13 @@ private:
   void clearVariantDetails();
 
   // UI Elements
-  QList<CommandVariant> commandVariants;  // List of command variants
-  int selectedVariantIndex;               // Index of the currently selected variant
+  QList<CommandVariant> commandVariants; // List of command variants
+  int selectedVariantIndex; // Index of the currently selected variant
 
-  QListWidget *variantList;               // List widget for displaying variants
-  QLineEdit *variantName;                 // Input field for variant name
-  QLineEdit *variantCondition;            // Input field for variant condition
-  QTextEdit *variantCommandStructure;     // Text area for the command structure
+  QListWidget *variantList;           // List widget for displaying variants
+  QLineEdit *variantName;             // Input field for variant name
+  QLineEdit *variantCondition;        // Input field for variant condition
+  QTextEdit *variantCommandStructure; // Text area for the command structure
 };
 
 #endif // VARIANTDIALOG_H

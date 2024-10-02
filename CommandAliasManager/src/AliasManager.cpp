@@ -3,18 +3,21 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <filesystem>
-#include <sstream>
 #include <regex>
+#include <sstream>
 
 // Define paths for storing alias data
 #ifdef _WIN32
-const std::string user_data_dir = std::string(getenv("APPDATA")) + "\\YourAppName\\";
+const std::string user_data_dir =
+    std::string(getenv("APPDATA")) + "\\YourAppName\\";
 #else
-const std::string user_data_dir = std::string(getenv("HOME")) + "/.YourAppName/";
+const std::string user_data_dir =
+    std::string(getenv("HOME")) + "/.YourAppName/";
 #endif
 
 const std::string alias_file_path = user_data_dir + "aliases.json";
-const std::string ps_commands_file_path = user_data_dir + "PowerShellCommands.csv";
+const std::string ps_commands_file_path =
+    user_data_dir + "PowerShellCommands.csv";
 
 // Static command dictionary for PowerShell commands
 std::unordered_map<std::string, std::string> AliasManager::ps_command_dict_;
@@ -27,10 +30,13 @@ Json::Value AliasManager::LoadAliases() {
     try {
       file >> aliases;
     } catch (const std::exception &e) {
-      QMessageBox::critical(nullptr, "Error", "Failed to load aliases: " + QString::fromStdString(e.what()));
+      QMessageBox::critical(nullptr, "Error",
+                            "Failed to load aliases: " +
+                                QString::fromStdString(e.what()));
     }
   } else {
-    QMessageBox::critical(nullptr, "Error", "Unable to open alias file for reading.");
+    QMessageBox::critical(nullptr, "Error",
+                          "Unable to open alias file for reading.");
   }
   return aliases;
 }
@@ -42,10 +48,13 @@ void AliasManager::SaveAliases(const Json::Value &aliases) {
     try {
       file << aliases;
     } catch (const std::exception &e) {
-      QMessageBox::critical(nullptr, "Error", "Failed to save aliases: " + QString::fromStdString(e.what()));
+      QMessageBox::critical(nullptr, "Error",
+                            "Failed to save aliases: " +
+                                QString::fromStdString(e.what()));
     }
   } else {
-    QMessageBox::critical(nullptr, "Error", "Unable to open alias file for writing.");
+    QMessageBox::critical(nullptr, "Error",
+                          "Unable to open alias file for writing.");
   }
 }
 
@@ -56,7 +65,8 @@ bool AliasManager::AliasExists(const std::string &alias) {
 }
 
 // Create a new alias with a given command
-void AliasManager::CreateAlias(const std::string &alias, const std::string &command) {
+void AliasManager::CreateAlias(const std::string &alias,
+                               const std::string &command) {
   Json::Value aliases = LoadAliases();
   aliases[alias] = command;
   SaveAliases(aliases);
@@ -72,7 +82,8 @@ std::string AliasManager::TranslateAlias(const std::string &aliasDefinition) {
 }
 
 // Bulk alias creation for batch operations
-void AliasManager::BulkAliasCreation(const std::vector<std::pair<std::string, std::string>> &aliases) {
+void AliasManager::BulkAliasCreation(
+    const std::vector<std::pair<std::string, std::string>> &aliases) {
   Json::Value currentAliases = LoadAliases();
   for (const auto &[alias, command] : aliases) {
     currentAliases[alias] = command;
@@ -84,7 +95,9 @@ void AliasManager::BulkAliasCreation(const std::vector<std::pair<std::string, st
 void AliasManager::LoadPowerShellCommands(const std::string &filepath) {
   std::ifstream file(filepath);
   if (!file.is_open()) {
-    QMessageBox::critical(nullptr, "Error", "Failed to load PowerShell commands from file: " + QString::fromStdString(filepath));
+    QMessageBox::critical(nullptr, "Error",
+                          "Failed to load PowerShell commands from file: " +
+                              QString::fromStdString(filepath));
     return;
   }
 
@@ -100,7 +113,8 @@ void AliasManager::LoadPowerShellCommands(const std::string &filepath) {
 }
 
 // Suggest commands based on a partial input
-std::vector<std::string> AliasManager::SuggestCommands(const std::string &input) {
+std::vector<std::string>
+AliasManager::SuggestCommands(const std::string &input) {
   std::vector<std::string> suggestions;
   for (const auto &cmd : ps_command_dict_) {
     if (cmd.first.find(input) != std::string::npos) {
@@ -111,9 +125,7 @@ std::vector<std::string> AliasManager::SuggestCommands(const std::string &input)
 }
 
 // Helper function to get the alias file path
-std::string AliasManager::GetAliasFilePath() {
-  return alias_file_path;
-}
+std::string AliasManager::GetAliasFilePath() { return alias_file_path; }
 
 // Helper function to get the PowerShell file path
 std::string AliasManager::GetPowerShellFilePath() {

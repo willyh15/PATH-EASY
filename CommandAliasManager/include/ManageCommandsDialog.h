@@ -3,32 +3,51 @@
 
 #include <QDialog>
 #include <QListWidget>
-#include <QMap>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QMap>
+#include <QString>
 
+// ManageCommandsDialog Class: Manages the addition, editing, and removal of commands
 class ManageCommandsDialog : public QDialog {
   Q_OBJECT
 
 public:
-  explicit ManageCommandsDialog(QWidget *parent = nullptr);
-  QMap<QString, QString> getCommands() const; // Returns the current command map
+  // Constructor
+  ManageCommandsDialog(QWidget *parent = nullptr);
 
-  // Getter for accessing the commands list UI element from outside
-  QListWidget *getCommandsList() { return commandsList; }
-  QMap<QString, QString> &getCommandMap() { return commandMap; }
+  // Retrieve the command map
+  QMap<QString, QString> getCommands() const;
+
+  // Accessor to get the commands list widget for external population
+  QListWidget *getCommandsList();
+
+  // Accessor to get the command map for modification
+  QMap<QString, QString> &getCommandMap();
 
 private slots:
-  void addCommand();      // Slot for adding a command
-  void editCommand();     // Slot for editing a command
-  void removeCommand();   // Slot for removing a command
+  // Slot to add a new command
+  void addCommand();
+
+  // Slot to edit the currently selected command
+  void editCommand();
+
+  // Slot to remove the currently selected command
+  void removeCommand();
 
 private:
-  // Member variables
-  QListWidget *commandsList;
-  QPushButton *addButton;
-  QPushButton *editButton;
-  QPushButton *removeButton;
-  QMap<QString, QString> commandMap; // Stores the command name-definition pairs
+  // UI Setup
+  void setupUI();
+  void setupConnections();
+
+  // UI Elements
+  QListWidget *commandsList;     // List widget for displaying commands
+  QPushButton *addButton;        // Button to add a new command
+  QPushButton *editButton;       // Button to edit the selected command
+  QPushButton *removeButton;     // Button to remove the selected command
+
+  // Command Map: Holds command name and its corresponding definition
+  QMap<QString, QString> commandMap;
 };
 
 #endif // MANAGECOMMANDSDIALOG_H

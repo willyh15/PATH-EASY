@@ -3,8 +3,7 @@
 #include <QMessageBox>
 
 // Constructor
-LabelingDialog::LabelingDialog(QWidget *parent)
-    : QDialog(parent) {
+LabelingDialog::LabelingDialog(QWidget *parent) : QDialog(parent) {
   setupUI();
   setupConnections();
 }
@@ -51,8 +50,10 @@ void LabelingDialog::setupUI() {
 // Set up signal-slot connections
 void LabelingDialog::setupConnections() {
   connect(addTagButton, &QPushButton::clicked, this, &LabelingDialog::addTag);
-  connect(removeTagButton, &QPushButton::clicked, this, &LabelingDialog::removeTag);
-  connect(saveButton, &QPushButton::clicked, this, &LabelingDialog::saveMetadata);
+  connect(removeTagButton, &QPushButton::clicked, this,
+          &LabelingDialog::removeTag);
+  connect(saveButton, &QPushButton::clicked, this,
+          &LabelingDialog::saveMetadata);
 }
 
 // Set the metadata for the selected command or template
@@ -68,9 +69,7 @@ void LabelingDialog::setMetadata(const CommandMetadata &metadata) {
 }
 
 // Get the updated metadata
-CommandMetadata LabelingDialog::getMetadata() const {
-  return commandMetadata;
-}
+CommandMetadata LabelingDialog::getMetadata() const { return commandMetadata; }
 
 // Slot to add a new tag to the tag list
 void LabelingDialog::addTag() {
@@ -94,7 +93,8 @@ void LabelingDialog::addTag() {
 void LabelingDialog::removeTag() {
   QListWidgetItem *selectedItem = tagList->currentItem();
   if (!selectedItem) {
-    QMessageBox::warning(this, "No Tag Selected", "Please select a tag to remove.");
+    QMessageBox::warning(this, "No Tag Selected",
+                         "Please select a tag to remove.");
     return;
   }
 
@@ -107,7 +107,7 @@ void LabelingDialog::removeTag() {
 void LabelingDialog::saveMetadata() {
   commandMetadata.label = labelInput->text();
   commandMetadata.annotation = annotationInput->toPlainText();
-  accept();  // Close the dialog and indicate success
+  accept(); // Close the dialog and indicate success
 }
 
 // Update the tag list with current tags

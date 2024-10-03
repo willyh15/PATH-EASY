@@ -31,17 +31,20 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git X:\src\vcpkg
         X:\src\vcpkg\bootstrap-vcpkg.bat
 
-    - name: Install Dependencies using vcpkg
-      # Install dependencies (Qt5, jsoncpp, boost) using the virtual drive
-      run: X:\src\vcpkg\vcpkg.exe install qt5 jsoncpp boost
+    - name: Update vcpkg and Install Dependencies
+      # Update vcpkg and install dependencies using the latest ports
+      run: |
+        git -C X:\src\vcpkg pull
+        X:\src\vcpkg\vcpkg.exe update
+        X:\src\vcpkg\vcpkg.exe install qt5 jsoncpp boost
 
     - name: Configure CMake with vcpkg Toolchain
       # Specify the toolchain file using the shortened path
       run: cmake -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=X:/src/vcpkg/scripts/buildsystems/vcpkg.cmake .
 
-    - name: Build the Project
-      # Build the project using CMake with the Release configuration
-      run: cmake --build . --config Release
+    - name: Build the Project with Verbose Output
+      # Build the project using CMake with verbose logging
+      run: cmake --build . --config Release --verbose
 
     - name: Archive Build Artifacts
       uses: actions/upload-artifact@v3

@@ -10,7 +10,6 @@ on:
 
 jobs:
   build:
-    # Use windows-2019 for better compatibility with Visual Studio 2019
     runs-on: windows-2019
 
     steps:
@@ -26,40 +25,28 @@ jobs:
         mkdir X:\src
 
     - name: Install vcpkg
-      # Install vcpkg in the virtual drive to avoid path length issues
       run: |
         git clone https://github.com/microsoft/vcpkg.git X:\src\vcpkg
         X:\src\vcpkg\bootstrap-vcpkg.bat
 
     - name: Clean Existing vcpkg Build Artifacts
-      # Clean existing build artifacts to ensure a clean rebuild
+      # Use PowerShell's Remove-Item to delete directories or cmd with rmdir
       run: |
         X:\src\vcpkg\vcpkg.exe remove boost-cobalt --recurse
-        rmdir /s /q X:\src\vcpkg\buildtrees\boost-cobalt
-        rmdir /s /q X:\src\vcpkg\packages\boost-cobalt_x64-windows
-        rmdir /s /q X:\src\vcpkg\installed\boost-cobalt
+        Remove-Item -Recurse -Force X:\src\vcpkg\buildtrees\boost-cobalt
+        Remove-Item -Recurse -Force X:\src\vcpkg\packages\boost-cobalt_x64-windows
+        Remove-Item -Recurse -Force X:\src\vcpkg\installed\boost-cobalt
         X:\src\vcpkg\vcpkg.exe update
         X:\src\vcpkg\vcpkg.exe install qt5 jsoncpp boost
 
     - name: Configure CMake with vcpkg Toolchain (Release)
-      # Specify the toolchain file using the shortened path and build in Release mode
       run: cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=X:/src/vcpkg/scripts/buildsystems/vcpkg.cmake .
 
-    - name: Build the Project in Release Mode
-      # Build the project using CMake with the Release configuration
+    - name: Build the Project (Release Configuration)
       run: cmake --build . --config Release -- -v
 
     - name: Archive Build Artifacts
-      # Upload the built executable as an artifact
       uses: actions/upload-artifact@v3
       with:
         name: CommandAliasManager-Executable
         path: ./Release/CommandAliasManager.exe
-
-    - name: Upload Build Logs
-      # Upload detailed logs for inspection if the build fails
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: boost-cobalt-debug-logs
-        path: X:/src/vcpkg/buildtrees/boost-cobalt/*.log

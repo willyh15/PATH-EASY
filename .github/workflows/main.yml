@@ -30,12 +30,19 @@ jobs:
         X:\src\vcpkg\bootstrap-vcpkg.bat
 
     - name: Clean Existing vcpkg Build Artifacts
-      # Use PowerShell's Remove-Item to delete directories or cmd with rmdir
+      # Check if directories exist before attempting to remove them
+      shell: pwsh
       run: |
         X:\src\vcpkg\vcpkg.exe remove boost-cobalt --recurse
-        Remove-Item -Recurse -Force X:\src\vcpkg\buildtrees\boost-cobalt
-        Remove-Item -Recurse -Force X:\src\vcpkg\packages\boost-cobalt_x64-windows
-        Remove-Item -Recurse -Force X:\src\vcpkg\installed\boost-cobalt
+        if (Test-Path -Path X:\src\vcpkg\buildtrees\boost-cobalt) {
+          Remove-Item -Recurse -Force X:\src\vcpkg\buildtrees\boost-cobalt
+        }
+        if (Test-Path -Path X:\src\vcpkg\packages\boost-cobalt_x64-windows) {
+          Remove-Item -Recurse -Force X:\src\vcpkg\packages\boost-cobalt_x64-windows
+        }
+        if (Test-Path -Path X:\src\vcpkg\installed\boost-cobalt) {
+          Remove-Item -Recurse -Force X:\src\vcpkg\installed\boost-cobalt
+        }
         X:\src\vcpkg\vcpkg.exe update
         X:\src\vcpkg\vcpkg.exe install qt5 jsoncpp boost
 

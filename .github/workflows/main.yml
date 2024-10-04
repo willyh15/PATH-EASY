@@ -50,4 +50,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: CommandAliasManager-Executable
-        path: ./Release/CommandAliasManager.ex
+        path: ./Release/CommandAliasManager.exe

@@ -30,24 +30,27 @@ jobs:
         X:\src\vcpkg\bootstrap-vcpkg.bat
 
     - name: Clean vcpkg Build Artifacts
-      # Use PowerShell's Remove-Item command to delete directories
+      # Check if directories exist before attempting to remove them
       shell: pwsh
       run: |
-        Remove-Item -Recurse -Force X:\src\vcpkg\buildtrees\boost-cobalt
-        Remove-Item -Recurse -Force X:\src\vcpkg\packages\boost-cobalt_x64-windows
-        Remove-Item -Recurse -Force X:\src\vcpkg\installed\boost-cobalt
+        if (Test-Path -Path X:\src\vcpkg\buildtrees\boost-cobalt) {
+          Remove-Item -Recurse -Force X:\src\vcpkg\buildtrees\boost-cobalt
+        }
+        if (Test-Path -Path X:\src\vcpkg\packages\boost-cobalt_x64-windows) {
+          Remove-Item -Recurse -Force X:\src\vcpkg\packages\boost-cobalt_x64-windows
+        }
+        if (Test-Path -Path X:\src\vcpkg\installed\boost-cobalt) {
+          Remove-Item -Recurse -Force X:\src\vcpkg\installed\boost-cobalt
+        }
         X:\src\vcpkg\vcpkg.exe update
 
     - name: Install Dependencies using vcpkg
-      # Switch to using the regular boost package instead of boost-cobalt
       run: X:\src\vcpkg\vcpkg.exe install qt5 jsoncpp boost
 
     - name: Configure CMake with vcpkg Toolchain (Release)
-      # Use Release mode instead of Debug to avoid configuration issues
       run: cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=X:/src/vcpkg/scripts/buildsystems/vcpkg.cmake .
 
     - name: Build the Project (Release Configuration)
-      # Build the project using CMake with the Release configuration
       run: cmake --build . --config Release -- -v
 
     - name: Archive Build Artifacts

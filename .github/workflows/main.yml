@@ -30,11 +30,12 @@ jobs:
         X:\src\vcpkg\bootstrap-vcpkg.bat
 
     - name: Clean vcpkg Build Artifacts
-      # Clean existing build artifacts to ensure a fresh rebuild
+      # Use PowerShell's Remove-Item command to delete directories
+      shell: pwsh
       run: |
-        rmdir /s /q X:\src\vcpkg\buildtrees\boost-cobalt
-        rmdir /s /q X:\src\vcpkg\packages\boost-cobalt_x64-windows
-        rmdir /s /q X:\src\vcpkg\installed\boost-cobalt
+        Remove-Item -Recurse -Force X:\src\vcpkg\buildtrees\boost-cobalt
+        Remove-Item -Recurse -Force X:\src\vcpkg\packages\boost-cobalt_x64-windows
+        Remove-Item -Recurse -Force X:\src\vcpkg\installed\boost-cobalt
         X:\src\vcpkg\vcpkg.exe update
 
     - name: Install Dependencies using vcpkg

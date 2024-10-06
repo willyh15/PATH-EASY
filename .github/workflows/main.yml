@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
     - name: Checkout Code
@@ -29,18 +29,14 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git X:\src\vcpkg
         X:\src\vcpkg\bootstrap-vcpkg.bat
 
-    - name: Clean vcpkg Build Artifacts
-      # Check if directories exist before attempting to remove them
+    - name: Clean vcpkg Build Artifacts and Update
       shell: pwsh
       run: |
-        if (Test-Path -Path X:\src\vcpkg\buildtrees\boost-cobalt) {
-          Remove-Item -Recurse -Force X:\src\vcpkg\buildtrees\boost-cobalt
-        }
-        if (Test-Path -Path X:\src\vcpkg\packages\boost-cobalt_x64-windows) {
-          Remove-Item -Recurse -Force X:\src\vcpkg\packages\boost-cobalt_x64-windows
-        }
-        if (Test-Path -Path X:\src\vcpkg\installed\boost-cobalt) {
-          Remove-Item -Recurse -Force X:\src\vcpkg\installed\boost-cobalt
+        $Paths = @("X:\src\vcpkg\buildtrees\boost-cobalt", "X:\src\vcpkg\packages\boost-cobalt_x64-windows", "X:\src\vcpkg\installed\boost-cobalt")
+        foreach ($Path in $Paths) {
+          if (Test-Path -Path $Path) {
+            Remove-Item -Recurse -Force $Path
+          }
         }
         X:\src\vcpkg\vcpkg.exe update
 
@@ -48,7 +44,13 @@ jobs:
       run: X:\src\vcpkg\vcpkg.exe install qt5 jsoncpp boost
 
     - name: Configure CMake with vcpkg Toolchain (Release)
-      run: cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=X:/src/vcpkg/scripts/buildsystems/vcpkg.cmake .
+      run: |
+        cmake -G "Visual Studio 16 2019" ^
+          -A x64 ^
+          -DCMAKE_BUILD_TYPE=Release ^
+          -DCMAKE_TOOLCHAIN_FILE=X:/src/vcpkg/scripts/buildsystems/vcpkg.cmake ^
+          -DCMAKE_PREFIX_PATH=X:/src/vcpkg/installed/x64-windows ^
+          .
 
     - name: Build the Project (Release Configuration)
       run: cmake --build . --config Release -- -v
@@ -60,7 +62,6 @@ jobs:
         path: ./Release/CommandAliasManager.exe
 
     - name: Upload Boost-Cobalt Build Logs
-      # Upload the build logs as artifacts if the build fails
       if: failure()
       uses: actions/upload-artifact@v3
       with:
